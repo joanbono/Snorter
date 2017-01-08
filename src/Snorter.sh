@@ -27,7 +27,6 @@ VIOLET='\033[0;35m'
 NOCOLOR='\033[0m'
 BOLD='\033[1m'
 
-
 function update_upgrade() {
 
 	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Updating and Upgrading repositories...\n\n"
