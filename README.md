@@ -17,8 +17,8 @@ Successfully tested in:
 Simply run on your terminal:
 
 ~~~~bash
-git clone https://github.com/joanbono/SnortBot.git
-cd SnortBot/Snorter
+git clone https://github.com/joanbono/Snorter.git
+cd Snorter/src
 ~~~~
 
 ###Execution
@@ -50,3 +50,4 @@ bash Snorter.sh XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 + [ ] Add a service to `/etc/init.d/snort`.
 + [ ] Initialize `Snort` with the system boot.
 + [ ] Detailed installation instructions (PDF?).
++ [ ] Dockerfile.
