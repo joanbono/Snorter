@@ -78,4 +78,4 @@ docker build SnorterDock
 + [ ] Add a service to `/etc/init.d/snort`.
 + [ ] Initialize `Snort` with the system boot.
 + [ ] Detailed installation instructions (PDF?).
-+ [x] Dockerfile.
++ [x] [Dockerfile](https://github.com/joanbono/Snorter/blob/master/src/SnorterDock/Dockerfile).
