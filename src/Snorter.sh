@@ -1,7 +1,7 @@
 #!/bin/bash
 # Title: Snorter.sh
 # Description: Install automatically Snort + Barnyard2 + PulledPork
-# Author: Joan Bono
+# Author: Joan Bono (@joan_bono)
 # Version: 0.7.2
 # Last Modified: jbono @ 20170108
 # Usage: bash Snorter.sh
