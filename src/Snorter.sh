@@ -2,7 +2,7 @@
 # Title: Snorter.sh
 # Description: Install automatically Snort + Barnyard2 + PulledPork
 # Author: Joan Bono (@joan_bono)
-# Version: 0.8.2
+# Version: 0.8.5
 # Last Modified: jbono @ 20170108
 
 ##################################
@@ -116,6 +116,7 @@ function snort_edit() {
 
 	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Enabling ${BOLD}local.rules${NOCOLOR} and adding a PING detection rule..."
 	sudo sed -i 's/#include \$RULE\_PATH\/local\.rules/include \$RULE\_PATH\/local\.rules/' /etc/snort/snort.conf
+	sudo chmod 766 /etc/snort/rules/local.rules
 	sudo echo 'alert icmp any any -> $HOME_NET any (msg:"Atac per PINGs"; sid:10000001; rev:001;)' >> /etc/snort/rules/local.rules
 
 	#SNORT OUTPUT: UNIFIED2 --> MANDATORY || CSV/TCPDUMP/BOTH
@@ -158,7 +159,7 @@ function snort_test() {
 	echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} Starting ${BOLD}SNORT${NOCOLOR} in test mode. Checking configuration file.... \n"
 	sudo snort -T -c /etc/snort/snort.conf
 
-	echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} Attempting to test ${BOLD}ICMP${NOCOLOR} rule. Send a PING to your ${BOLD}SNORT${NOCOLOR} machine. Press ${BOLD}Ctrl+C${NOCOLOR} once and wait few seconds to stop the process...\n "
+	echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} Attempting to test ${BOLD}ICMP${NOCOLOR} rule in ${BOLD}$INTERFACE${NOCOLOR}. Send a PING to your ${BOLD}SNORT${NOCOLOR} machine. Press ${BOLD}Ctrl+C${NOCOLOR} once and wait few seconds to stop the process...\n "
 	echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} Press ${BOLD}ENTER${NOCOLOR} to continue. "
 	read -n 1 -s
 	sudo snort -A console -q -u snort -g snort -c /etc/snort/snort.conf -i $INTERFACE 
@@ -285,6 +286,7 @@ function pulledpork_install(){
 	sudo touch /etc/snort/rules/iplists/default.blacklist > /dev/null 2>&1
 
 	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Adding ${BOLD}PULLEDPORK${NOCOLOR} to crontab. [Everyday at 4:15 AM].\n\n"
+	sudo chmod 766 /etc/crontab
 	sudo echo "15 4 * * * root pulledpork.pl -c /etc/snort/pulledpork.conf -i disablesid.conf -T -H" >> /etc/crontab
 	
 	pulledpork.pl -V
@@ -336,7 +338,7 @@ function service_create() {
 
 function last_steps() {
 
-	echo -ne "\n\t${YELLOW}[!] IMPORTANT:${NOCOLOR} Now edit your ${BOLD}/etc/snort/snort.conf${NOCOLOR} and enable the rules you need by uncommnet the lines"
+	echo -ne "\n\t${YELLOW}[!] IMPORTANT:${NOCOLOR} Now edit your ${BOLD}/etc/snort/snort.conf${NOCOLOR} and enable the rules you need by uncomment the lines"
 	echo -ne "\n\t${YELLOW}[!] EXAMPLE:${NOCOLOR} If you want to enable the ${BOLD}Exploit rules${NOCOLOR}, remove the ${RED}${BOLD}#${NOCOLOR}:"
 	echo -ne "\n\t\t${RED}#${NOCOLOR}include \$RULE_PATH/exploit.rules ${GREEN}-->${NOCOLOR} include \$RULE_PATH/exploit.rules\n\n"
 
