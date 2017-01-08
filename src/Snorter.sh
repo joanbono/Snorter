@@ -2,10 +2,8 @@
 # Title: Snorter.sh
 # Description: Install automatically Snort + Barnyard2 + PulledPork
 # Author: Joan Bono (@joan_bono)
-# Version: 0.7.2
+# Version: 0.8.5
 # Last Modified: jbono @ 20170108
-# Usage: bash Snorter.sh
-# Usage: bash Snorter.sh OINKCODE
 
 ##################################
 #         TODO LIST              #
@@ -17,14 +15,7 @@
 #
 #  system_start --> Add to rc.local and reboot
 #
-#  Finish last_steps function
-#
 #  Add start to .bashrc \o/
-
-OINKCODE=$1 
-MACHINE=$(echo $(uname -m))
-SNORT=$(echo $(curl -s https://www.snort.org | grep "wget" | grep -oP "snort\-\d.\d\.\d(\.\d)?"))
-DAQ=$(echo $(curl -s https://www.snort.org | grep "wget" | grep -oP "daq\-\d\.\d\.\d"))
 
 RED='\033[0;31m'
 ORANGE='\033[0;205m'
@@ -34,21 +25,13 @@ CYAN='\033[0;96m'
 BLUE='\033[0;34m'
 VIOLET='\033[0;35m'
 NOCOLOR='\033[0m'
+BOLD='\033[1m'
 
-
-function check_version() {
+function update_upgrade() {
 
 	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Updating and Upgrading repositories...\n\n"
 	sudo apt-get update && sudo apt-get upgrade -y --force-yes
-	echo "SNORT: "$SNORT
-	echo "DAQ: "$DAQ
-	echo "MACHINE: "$MACHINE
 	
-	if [ "$(echo ${#OINKCODE})" == "40" ]; then
-		echo "OINKCODE: "$OINKCODE
-	else
-		echo "OINKCODE: No OINKCODE selected"
-	fi
 }
 
 function snort_install() {
@@ -58,36 +41,36 @@ function snort_install() {
 	
 	#Downloading DAQ and SNORT
 	cd $HOME && mkdir snort_src && cd snort_src
-	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Downloading $DAQ.\n\n"
+	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Downloading ${BOLD}$DAQ${NOCOLOR}.\n\n"
 	wget -P $HOME/snort_src https://snort.org/downloads/snort/$DAQ.tar.gz
-	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Downloading $SNORT.\n\n"
+	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Downloading ${BOLD}$SNORT${NOCOLOR}.\n\n"
 	wget -P $HOME/snort_src https://snort.org/downloads/snort/$SNORT.tar.gz
 	
 	#Installing DAQ
 	cd $HOME/snort_src/
-	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Installing $DAQ.\n\n"
+	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Installing ${BOLD}$DAQ${NOCOLOR}.\n\n"
 	tar xvfz $DAQ.tar.gz
 	mv $HOME/snort_src/daq-*/ $HOME/snort_src/daq                     
 	cd $HOME/snort_src/daq
 	./configure && make && sudo make install 
-	echo -ne "\n\t${GREEN}[+] INFO:${NOCOLOR} $DAQ installed successfully.\n\n"
+	echo -ne "\n\t${GREEN}[+] INFO:${NOCOLOR} ${BOLD}$DAQ${NOCOLOR} installed successfully.\n\n"
 	
 	#Installing SNORT
 	cd $HOME/snort_src
-	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Installing $DAQ.\n\n"
+	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Installing ${BOLD}$DAQ${NOCOLOR}.\n\n"
 	tar xvfz $SNORT.tar.gz > /dev/null 2>&1
 	rm -r *.tar.gz > /dev/null 2>&1
 	mv snort-*/ snort           
 	cd snort
 	./configure --enable-sourcefire && make && sudo make install
-	echo -ne "\n\t${GREEN}[+] INFO:${NOCOLOR} $SNORT installed successfully.\n\n"
+	echo -ne "\n\t${GREEN}[+] INFO:${NOCOLOR} ${BOLD}$SNORT${NOCOLOR} installed successfully.\n\n"
 	cd ..
 	
 	sudo ldconfig
 	sudo ln -s /usr/local/bin/snort /usr/sbin/snort
 
 	#Adding SNORT user and group for running SNORT
-	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Adding user and group SNORT.\n\n"
+	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Adding user and group ${BOLD}SNORT${NOCOLOR}.\n\n"
 	sudo groupadd snort
 	sudo useradd snort -r -s /sbin/nologin -c SNORT_IDS -g snort
 	sudo mkdir /etc/snort > /dev/null 2>&1
@@ -103,57 +86,58 @@ function snort_install() {
 	sudo chown -R snort:snort /var/log/snort > /dev/null 2>&1
 	sudo chown -R snort:snort /usr/local/lib/snort_dynamicrules > /dev/null 2>&1
 	
-	sudo cp ~/snort_src/snort/etc/*.conf* /etc/snort
-	sudo cp ~/snort_src/snort/etc/*.map /etc/snort
+	sudo cp ~/snort_src/snort/etc/*.conf* /etc/snort > /dev/null 2>&1
+	sudo cp ~/snort_src/snort/etc/*.map /etc/snort > /dev/null 2>&1
 	
 	sudo sed -i 's/include \$RULE\_PATH/#include \$RULE\_PATH/' /etc/snort/snort.conf
 	
 	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} /var/log/snort and /etc/snort created and configurated.\n\n"
 	sudo /usr/local/bin/snort -V
-	echo -ne "\n\t${GREEN}[+] INFO:${NOCOLOR} Snort is successfully installed and configured!"
+	echo -ne "\n\t${GREEN}[+] INFO:${NOCOLOR} ${BOLD}SNORT${NOCOLOR} is successfully installed and configurated!"
 
 }
 
 function snort_edit() {
 
-	echo -ne "\n\t${YELLOW}[!] INFO:${NOCOLOR} Now it's time to edit the Snort configuration file.\n\n"
-	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Add your HOME_NET address [Ex: 192.168.1.0/24]"
-	echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} Press ENTER to continue. "
+	echo -ne "\n\t${YELLOW}[!] INFO:${NOCOLOR} Now it's time to edit the ${BOLD}SNORT${NOCOLOR} configuration file.\n\n"
+	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Add your ${BOLD}HOME_NET${NOCOLOR} address [Ex: 192.168.1.0/24]"
+	echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} Press ${BOLD}ENTER${NOCOLOR} to continue. "
 	read -n 1 -s
 	sudo vim /etc/snort/snort.conf -c "/ipvar HOME_NET"
 
-	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Add your EXTERNAL_NET address [Ex: !\$HOME_NET]"
-	echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} Press ENTER to continue. "
+	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Add your ${BOLD}EXTERNAL_NET${NOCOLOR} address [Ex: !\$HOME_NET]"
+	echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} Press ${BOLD}ENTER${NOCOLOR} to continue. "
 	read -n 1 -s
 	sudo vim /etc/snort/snort.conf -c "/ipvar EXTERNAL_NET"
 
-	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Adding RULE_PATH to snort.conf file"
+	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Adding ${BOLD}RULE_PATH${NOCOLOR} to snort.conf file"
 	sudo sed -i 's/RULE_PATH\ \.\.\//RULE_PATH\ \/etc\/snort\//g' /etc/snort/snort.conf
 	sudo sed -i 's/_LIST_PATH\ \.\.\//_LIST_PATH\ \/etc\/snort\//g' /etc/snort/snort.conf
 
-	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Enabling local.rules and adding a PING detection rule..."
+	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Enabling ${BOLD}local.rules${NOCOLOR} and adding a PING detection rule..."
 	sudo sed -i 's/#include \$RULE\_PATH\/local\.rules/include \$RULE\_PATH\/local\.rules/' /etc/snort/snort.conf
+	sudo chmod 766 /etc/snort/rules/local.rules
 	sudo echo 'alert icmp any any -> $HOME_NET any (msg:"Atac per PINGs"; sid:10000001; rev:001;)' >> /etc/snort/rules/local.rules
 
 	#SNORT OUTPUT: UNIFIED2 --> MANDATORY || CSV/TCPDUMP/BOTH
 	sudo sed -i 's/# unified2/output unified2: filename snort.u2, limit 128/g' /etc/snort/snort.conf
 	
 	while true; do
-		echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} Unified2 output configured. Configure another output?\n\t\t1 - CSV output\n\t\t2 - TCPdump output\n\t\t3 - CSV and TCPdump output\n\t\t4 - None\n\n\tOption [1-4]: "
+		echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} Unified2 output configured. Configure another output?\n\t\t${YELLOW}1${NOCOLOR} - ${BOLD}CSV${NOCOLOR} output\n\t\t${YELLOW}2${NOCOLOR} - ${BOLD}TCPdump${NOCOLOR} output\n\t\t${YELLOW}3${NOCOLOR} - ${BOLD}CSV${NOCOLOR} and ${BOLD}TCPdump${NOCOLOR} output\n\t\t${YELLOW}4${NOCOLOR} - ${BOLD}None${NOCOLOR}\n\n\tOption [1-4]: "
 		read OPTION
 		case $OPTION in
 			1 )
-				echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} CSV output will be configured\n"
+				echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} ${BOLD}CSV${NOCOLOR} output will be configured\n"
 				sudo sed -i 's/# syslog/output alert_csv: \/var\/log\/alert.csv default/g' /etc/snort/snort.conf
 				break
 				;;
 			2 )
-				echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} TCPdump output will be configured\n"
+				echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} ${BOLD}TCPdump${NOCOLOR} output will be configured\n"
 				sudo sed -i 's/# pcap/output log_tcpdump: snort.log/g' /etc/snort/snort.conf
 				break
 				;;
 			3 )
-				echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} CSV and TCPdump output will be configured\n"
+				echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} ${BOLD}CSV${NOCOLOR} and ${BOLD}TCPdump${NOCOLOR} output will be configured\n"
 				sudo sed -i 's/# syslog/output alert_csv: \/var\/log\/snort\/alert.csv default/g' /etc/snort/snort.conf
 				sudo sed -i 's/# pcap/output log_tcpdump: \/var\/log\/snort\/snort.log/g' /etc/snort/snort.conf
 				break
@@ -172,13 +156,13 @@ function snort_edit() {
 
 function snort_test() {
 
-	echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} Starting SNORT in test mode. Checking configuration file.... \n"
+	echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} Starting ${BOLD}SNORT${NOCOLOR} in test mode. Checking configuration file.... \n"
 	sudo snort -T -c /etc/snort/snort.conf
 
-	echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} Attempting to test ICMP rule. Send a PING to your SNORT machine. Press Ctrl+C to stop...\n "
-	echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} Press ENTER to continue. "
+	echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} Attempting to test ${BOLD}ICMP${NOCOLOR} rule in ${BOLD}$INTERFACE${NOCOLOR}. Send a PING to your ${BOLD}SNORT${NOCOLOR} machine. Press ${BOLD}Ctrl+C${NOCOLOR} once and wait few seconds to stop the process...\n "
+	echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} Press ${BOLD}ENTER${NOCOLOR} to continue. "
 	read -n 1 -s
-	sudo snort -A console -q -u snort -g snort -c /etc/snort/snort.conf -i eth0
+	sudo snort -A console -q -u snort -g snort -c /etc/snort/snort.conf -i $INTERFACE 
 	killall -9 snort
 	
 }
@@ -186,7 +170,7 @@ function snort_test() {
 function barnyard2_ask() {
 
 	while true; do
-		echo -ne "\n\t${YELLOW}[!] IMPORTANT:${NOCOLOR} Would you like to install Barnyard2? [Y/n] "
+		echo -ne "\n\t${YELLOW}[!] IMPORTANT:${NOCOLOR} Would you like to install ${BOLD}BARNYARD2${NOCOLOR}? [Y/n] "
 		read OPTION
 		case $OPTION in
 			Y|y )
@@ -194,7 +178,7 @@ function barnyard2_ask() {
 				break
 				;;
 			N|n )
-				echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Barnyard2 won't be installed.\n\n"
+				echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} ${BOLD}BARNYARD2${NOCOLOR} won't be installed.\n\n"
 				break
 				;;
 			* )
@@ -206,26 +190,24 @@ function barnyard2_ask() {
 }
 
 function barnyard2_install() {
-	echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} Insert new SNORT Database Password: "
+	echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} Insert new ${BOLD}SNORT${NOCOLOR} Database Password: "
 	read SNORTSQLPASSWORD
 	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Installing dependencies."
-	echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} You will be asked for a password for MySQL service if it isn't installed in the system."
-	echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} Press ENTER to continue. "
+	echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} You will be asked for a ${BOLD}password for MySQL${NOCOLOR} service if it isn't installed in the system."
+	echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} Press ${BOLD}ENTER${NOCOLOR} to continue. "
 	read -n 1 -s
 
 	sudo apt-get install -y --force-yes mysql-server libmysqlclient-dev mysql-client autoconf libtool libdnet checkinstall yagiuda libdnet-dev locate
 	
 	cd $HOME/snort_src
-	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Downloading Barnyard2.\n\n"
+	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Downloading ${BOLD}BARNYARD2${NOCOLOR}.\n\n"
 	git clone https://github.com/firnsy/barnyard2.git && cd $HOME/snort_src/barnyard2
 	autoreconf -fvi -I ./m4
 	
 	ln -s /usr/include/dumbnet.h dnet.h
 	
-	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Installing Barnyard2.\n\n"
+	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Installing ${BOLD}BARNYARD2${NOCOLOR}2.\n\n"
 
-	#Raspberry Pi
-	#./configure --with-mysql --with-mysql-libraries=/usr/lib/arm-linux-gnueabihf
 	if [ "$MACHINE" == "x86_64" ]; then
 		./configure --with-mysql --with-mysql-libraries=/usr/lib/x86_64-linux-gnu
 	elif [ "$MACHINE" == "i386" ]; then
@@ -234,12 +216,10 @@ function barnyard2_install() {
 		./configure --with-mysql --with-mysql-libraries=/usr/lib/arm-linux-gnueabihf
 	fi
 		
-	#./configure --with-mysql --with-mysql-libraries=/usr/lib/$MACHINE
-	
 	make
 	sudo make install
 	
-	echo -ne "\n\t${GREEN}[+] INFO:${NOCOLOR} Barnyard2 installed successfully.\n\n"
+	echo -ne "\n\t${GREEN}[+] INFO:${NOCOLOR} ${COLOR}BARNYARD2${NOCOLOR} installed successfully.\n\n"
 	
 	sudo cp etc/barnyard2.conf /etc/snort > /dev/null 2>&1
 	sudo mkdir /var/log/barnyard2 > /dev/null 2>&1
@@ -248,29 +228,27 @@ function barnyard2_install() {
 	sudo chown snort.snort /var/log/snort/barnyard2.waldo > /dev/null 2>&1
 	sudo touch /etc/snort/sid-msg.map > /dev/null 2>&1
 
-	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} The SNORT database is going to be created. You will be asked for ${RED}MySQL password 3 times${NOCOLOR}"
-	echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} Press ENTER to continue. "
+	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} The ${BOLD}SNORT${NOCOLOR} database is going to be created. You will be asked for ${RED}MySQL password 3 times${NOCOLOR}"
+	echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} Press ${BOLD}ENTER${NOCOLOR} to continue. "
 	read -n 1 -s
 	echo -ne "\n\n"
 
 	sudo /etc/init.d/mysql start > /dev/null 2>&1
 	echo "create database snort;" | mysql -u root -p
-	mysql -u root -p -D snort < ~/snort_src/barnyard2/schemas/create_mysql
+	mysql -u root -p -D snort < $HOME/snort_src/barnyard2/schemas/create_mysql
 	echo "grant create, insert, select, delete, update on snort.* to 'snort'@'localhost' identified by '$SNORTSQLPASSWORD'" | mysql -u root -p
 	
 	sudo echo "output database: log, mysql, user=snort password=$SNORTSQLPASSWORD dbname=snort host=localhost" >> /etc/snort/barnyard2.conf 
 	sudo chmod o-r /etc/snort/barnyard2.conf
 	
-	echo -ne "${RED}"
 	barnyard2 -V
-	echo -ne "${NOCOLOR}"
-	echo -ne "\n\t${GREEN}[+] INFO:${NOCOLOR} Barnyard2 is successfully installed and configured!"
+	echo -ne "\n\t${GREEN}[+] INFO:${NOCOLOR} ${BOLD}BARNYARD2${NOCOLOR} is successfully installed and configurated!"
 
 }
 
 function pulledpork_ask() {
 
-	echo -ne "\n\t${YELLOW}[!] IMPORTANT:${NOCOLOR} Would you like to install PulledPork? [Y/n] "
+	echo -ne "\n\t${YELLOW}[!] IMPORTANT:${NOCOLOR} Would you like to install ${BOLD}PULLEDPORK${NOCOLOR}? [Y/n] "
 	while true; do
 		read OPTION
 		case $OPTION in
@@ -280,7 +258,7 @@ function pulledpork_ask() {
 				break
 				;;
 			N|n )
-				echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} PulledPork won't be installed.\n\n"
+				echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} ${BOLD}PULLEDPORK${NOCOLOR} won't be installed.\n\n"
 				break
 				;;
 			* )
@@ -296,9 +274,9 @@ function pulledpork_install(){
 	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Installing dependencies.\n\n"
 	sudo apt-get install -y --force-yes libcrypt-ssleay-perl liblwp-useragent-determined-perl
 	
-	cd ~/snort_src
+	cd $HOME/snort_src
 	
-	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Downloading PulledPork.\n\n"
+	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Downloading ${BOLD}PULLEDPORK${NOCOLOR}.\n\n"
 	git clone https://github.com/shirkdog/pulledpork.git
 	cd $HOME/snort_src/pulledpork
 	sudo cp pulledpork.pl /usr/local/bin > /dev/null 2>&1
@@ -307,11 +285,12 @@ function pulledpork_install(){
 	sudo mkdir /etc/snort/rules/iplists  > /dev/null 2>&1
 	sudo touch /etc/snort/rules/iplists/default.blacklist > /dev/null 2>&1
 
-	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Adding PulledPork to crontab. [Everyday at 4:15 AM].\n\n"
+	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Adding ${BOLD}PULLEDPORK${NOCOLOR} to crontab. [Everyday at 4:15 AM].\n\n"
+	sudo chmod 766 /etc/crontab
 	sudo echo "15 4 * * * root pulledpork.pl -c /etc/snort/pulledpork.conf -i disablesid.conf -T -H" >> /etc/crontab
 	
 	pulledpork.pl -V
-	echo -ne "\n\t${GREEN}[+] INFO:${NOCOLOR} PulledPork is successfully installed and configured!"
+	echo -ne "\n\t${GREEN}[+] INFO:${NOCOLOR} ${BOLD}PULLEDPORK${NOCOLOR} is successfully installed and configured!"
 
 }
 
@@ -322,16 +301,16 @@ function pulledpork_edit() {
 	fi
 
 	while true; do
-		echo -ne "\n\t${YELLOW}[!] IMPORTANT:${NOCOLOR} Would you like to enable Emerging Threats rules? [Y/n] "
+		echo -ne "\n\t${YELLOW}[!] IMPORTANT:${NOCOLOR} Would you like to enable ${BOLD}Emerging Threats${NOCOLOR} rules? [Y/n] "
 		read OPTION
 		case $OPTION in
 			Y|y )
 				sudo sed -i "s/#rule_url=https:\/\/rules.emergingthreats.net\//rule_url=https:\/\/rules.emergingthreats.net\//g" /etc/snort/pulledpork.conf
-				echo -ne "\n\t${GREEN}[+] INFO:${NOCOLOR} Emerging Threats rules enabled!"
+				echo -ne "\n\t${GREEN}[+] INFO:${NOCOLOR} ${BOLD}Emerging Threats${NOCOLOR} rules enabled!"
 				break
 				;;
 			N|n )
-				echo -ne "\n\t${GREEN}[+] INFO:${NOCOLOR} Emerging Threats rules disabled!"
+				echo -ne "\n\t${GREEN}[+] INFO:${NOCOLOR} ${BOLD}Emerging Threats${NOCOLOR} rules disabled!"
 				break
 				;;
 			* )
@@ -340,7 +319,7 @@ function pulledpork_edit() {
 		esac
 	done
 
-	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Editing pulledpork.conf settings...\n"
+	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Editing ${BOLD}pulledpork.conf${NOCOLOR} settings...\n"
 	sudo sed -i "s/\/usr\/local\/etc\/snort\//\/etc\/snort\//g" /etc/snort/pulledpork.conf
 	sudo sed -i "s/# enablesid=/enablesid=/g" /etc/snort/pulledpork.conf
 	sudo sed -i "s/# dropsid=/enablesid=/g" /etc/snort/pulledpork.conf
@@ -359,27 +338,29 @@ function service_create() {
 
 function last_steps() {
 
-	echo "Now edit your /etc/snort/snort.conf and enable the rules you need by uncommnet the lines"
+	echo -ne "\n\t${YELLOW}[!] IMPORTANT:${NOCOLOR} Now edit your ${BOLD}/etc/snort/snort.conf${NOCOLOR} and enable the rules you need by uncomment the lines"
+	echo -ne "\n\t${YELLOW}[!] EXAMPLE:${NOCOLOR} If you want to enable the ${BOLD}Exploit rules${NOCOLOR}, remove the ${RED}${BOLD}#${NOCOLOR}:"
+	echo -ne "\n\t\t${RED}#${NOCOLOR}include \$RULE_PATH/exploit.rules ${GREEN}-->${NOCOLOR} include \$RULE_PATH/exploit.rules\n\n"
+
 
 }
 
 function system_start(){
 
 	echo "ASK start system"
-	echo -ne "\n\t${GREEN}[+] INFO:${NOCOLOR} Starting PULLEDPORK to download latest ruleset...\n"
+	echo -ne "\n\t${GREEN}[+] INFO:${NOCOLOR} Starting ${BOLD}PULLEDPORK${NOCOLOR} to download latest ruleset...\n"
 	pulledpork.pl -c /etc/snort/pulledpork.conf -i disablesid.conf -T -H
-	echo -ne "\n\t${GREEN}[+] INFO:${NOCOLOR} Checking ruleset. Starting SNORT in test mode...\n"
+	echo -ne "\n\t${GREEN}[+] INFO:${NOCOLOR} Checking ruleset. Starting ${BOLD}SNORT${NOCOLOR} in test mode...\n"
 	sudo snort -T -c /etc/snort/snort.conf
-	echo -ne "\n\t${GREEN}[+] INFO:${NOCOLOR} Starting SNORT and BARNYARD2...\n"
+	echo -ne "\n\t${GREEN}[+] INFO:${NOCOLOR} Starting ${BOLD}SNORT${NOCOLOR} and ${BOLD}BARNYARD2${NOCOLOR}...\n"
 	sudo barnyard2 -c /etc/snort/barnyard2.conf -d /var/log/snort -f snort.u2 -w /var/log/snort/barnyard2.waldo -g snort -u snort &
-	sudo /usr/local/bin/snort -q -u snort -g snort -c /etc/snort/snort.conf -i eth0
+	sudo /usr/local/bin/snort -q -u snort -g snort -c /etc/snort/snort.conf -i $INTERFACE 
 
-	echo -ne "\n\t${GREEN}[+] SUCCESS:${NOCOLOR} SNORT and BARNYARD2 running in the system!\n\n"
+	echo -ne "\n\t${GREEN}[+] SUCCESS:${NOCOLOR} ${BOLD}SNORT${NOCOLOR} and ${BOLD}BARNYARD2${NOCOLOR} running in the system!\n\n"
 
 }
 
 function banner(){
-
 
 	echo -ne """
 	                ,-,------,	
@@ -397,17 +378,16 @@ function banner(){
 
 function help_usage(){
 	
-	if [ "$1" == "-h" ] || [ "$1" == "--help" ]; then 
-		echo -ne "\n\t\t${YELLOW}USAGE:${NOCOLOR} $0"
-		echo -ne "\n\t\t${YELLOW}USAGE:${NOCOLOR} $0 ${GREEN}OINKCODE${NOCOLOR}\n\n"
-		exit 0
-	fi
+	echo -ne "\n\t\t${YELLOW}USAGE:${NOCOLOR} $0 -i ${GREEN}INTERFACE${NOCOLOR}"
+	echo -ne "\n\t\t${YELLOW}USAGE:${NOCOLOR} $0 -o ${GREEN}OINKCODE${NOCOLOR} -i ${GREEN}INTERFACE${NOCOLOR}"
+	echo -ne "\n\t\t${YELLOW}Example:${NOCOLOR} $0 -o ${GREEN}123456abcdefgh${NOCOLOR} -i ${GREEN}eth0${NOCOLOR}\n\n"
+	exit 0
+
 }
+
 function main() {
 
-	banner
-	help_usage $1
-	check_version
+	update_upgrade
 	snort_install
 	snort_edit
 	snort_test
@@ -419,4 +399,62 @@ function main() {
 
 }
 
-main $1
+#PARSE PARAMETERS/CHECK FOR INTERFACE/CHECK FOR OINKCODE
+
+banner
+
+while getopts ":o:i:" OPTION; do
+    case "${OPTION}" in
+        o)
+            OINKCODE=${OPTARG}
+            ;;
+        i)
+            INTERFACE=${OPTARG}
+            ;;
+        *)
+            help_usage
+            ;;
+    esac
+done
+
+shift $((OPTIND-1))
+
+if [ -z "${INTERFACE}" ] ; then
+
+    echo -ne "\n\t\t${RED}[-] ERROR:${NOCOLOR} ${BOLD}Interface${NOCOLOR} is mandatory\n"
+    help_usage
+
+fi
+	
+if [ "$(echo ${#OINKCODE})" -eq 40 ]; then
+	
+	MACHINE=$(echo $(uname -m))
+	SNORT=$(echo $(curl -s https://www.snort.org | grep "wget" | grep -oP "snort\-\d.\d\.\d(\.\d)?"))
+	DAQ=$(echo $(curl -s https://www.snort.org | grep "wget" | grep -oP "daq\-\d\.\d\.\d"))
+
+	echo -ne "\n\t\t${GREEN}[+] OINKCODE:${NOCOLOR} ${OINKCODE}"
+	echo -ne "\n\t\t${GREEN}[+] INTERFACE:${NOCOLOR} ${INTERFACE}"
+	echo -ne "\n\t\t${GREEN}[+] DAQ:${NOCOLOR} $DAQ"
+	echo -ne "\n\t\t${GREEN}[+] SNORT:${NOCOLOR} $SNORT"
+	echo -ne "\n\t\t${GREEN}[+] ARCH:${NOCOLOR} $MACHINE\n\n"
+	main
+
+elif [ "$(echo ${#OINKCODE})" -lt 40 ] && [ "$(echo ${#OINKCODE})" -gt 0 ]; then
+	
+	echo -ne "\n\t\t${RED}[-] ERROR:${NOCOLOR} Invalid ${BOLD}OINKCODE${NOCOLOR}\n"
+	help_usage
+
+elif [ $(echo ${#OINKCODE}) -lt 40 ] || [ $(echo ${#OINKCODE}) -gt 1 ]; then
+	
+	MACHINE=$(echo $(uname -m))
+	SNORT=$(echo $(curl -s https://www.snort.org | grep "wget" | grep -oP "snort\-\d.\d\.\d(\.\d)?"))
+	DAQ=$(echo $(curl -s https://www.snort.org | grep "wget" | grep -oP "daq\-\d\.\d\.\d"))
+
+	echo -ne "\n\t\t${GREEN}[+] OINKCODE:${NOCOLOR} No OINKCODE provided."
+	echo -ne "\n\t\t${GREEN}[+] INTERFACE:${NOCOLOR} ${INTERFACE}"
+	echo -ne "\n\t\t${GREEN}[+] DAQ:${NOCOLOR} $DAQ"
+	echo -ne "\n\t\t${GREEN}[+] SNORT:${NOCOLOR} $SNORT"
+	echo -ne "\n\t\t${GREEN}[+] ARCH:${NOCOLOR} $MACHINE\n\n"
+	main
+
+fi
