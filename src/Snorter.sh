@@ -17,6 +17,8 @@
 #
 #  system_start --> Add to rc.local and reboot
 #
+#  Finish last_steps function
+#
 #  Add start to .bashrc \o/
 
 OINKCODE=$1 
