@@ -13,6 +13,10 @@
 #
 #  sudo service snort status
 #
+#  Ask to add Snort/Barnyard to /etc/init.d
+#
+#  system_start --> Add to rc.local and reboot
+#
 #  Add start to .bashrc \o/
 
 OINKCODE=$1 
