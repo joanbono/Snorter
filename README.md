@@ -76,7 +76,7 @@ docker build SnorterDock -e OINKCODE=<oinkcode> -e INTERFACE=<interface>
 
 ***
 
-##Install Instruction
+##Install Instructions
 
 + English: [PDF](doc/Instructions_EN.pdf)  -  [MarkDown](doc/doc_EN.md)
 + Spanish: [PDF](doc/Instructions_ES.pdf)  -  [MarkDown](doc/doc_ES.md)
