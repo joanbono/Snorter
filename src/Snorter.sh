@@ -2,20 +2,8 @@
 # Title: Snorter.sh
 # Description: Install automatically Snort + Barnyard2 + PulledPork
 # Author: Joan Bono (@joan_bono)
-# Version: 0.8.5
-# Last Modified: jbono @ 20170108
-
-##################################
-#         TODO LIST              #
-##################################
-#
-#  sudo service snort status
-#
-#  Ask to add Snort/Barnyard to /etc/init.d
-#
-#  system_start --> Add to rc.local and reboot
-#
-#  Add start to .bashrc \o/
+# Version: 0.9.5
+# Last Modified: jbono @ 20170109
 
 RED='\033[0;31m'
 ORANGE='\033[0;205m'
@@ -190,6 +178,7 @@ function barnyard2_ask() {
 }
 
 function barnyard2_install() {
+
 	echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} Insert new ${BOLD}SNORT${NOCOLOR} Database Password: "
 	read SNORTSQLPASSWORD
 	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Installing dependencies."
@@ -239,6 +228,7 @@ function barnyard2_install() {
 	echo "grant create, insert, select, delete, update on snort.* to 'snort'@'localhost' identified by '$SNORTSQLPASSWORD'" | mysql -u root -p
 	
 	sudo echo "output database: log, mysql, user=snort password=$SNORTSQLPASSWORD dbname=snort host=localhost" >> /etc/snort/barnyard2.conf 
+	sudo chmod 766 /etc/snort/barnyard2.conf
 	sudo chmod o-r /etc/snort/barnyard2.conf
 	
 	barnyard2 -V
@@ -269,7 +259,7 @@ function pulledpork_ask() {
 
 }
 
-function pulledpork_install(){
+function pulledpork_install() {
 	
 	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Installing dependencies.\n\n"
 	sudo apt-get install -y --force-yes libcrypt-ssleay-perl liblwp-useragent-determined-perl
@@ -289,7 +279,7 @@ function pulledpork_install(){
 	sudo chmod 766 /etc/crontab
 	sudo echo "15 4 * * * root pulledpork.pl -c /etc/snort/pulledpork.conf -i disablesid.conf -T -H" >> /etc/crontab
 	
-	pulledpork.pl -V
+	sudo pulledpork.pl -V
 	echo -ne "\n\t${GREEN}[+] INFO:${NOCOLOR} ${BOLD}PULLEDPORK${NOCOLOR} is successfully installed and configured!"
 
 }
@@ -331,8 +321,149 @@ function pulledpork_edit() {
 
 function service_create() {
 
-	echo "TODO --> Add Service /etc/init.d/snort"
-	echo "TODO --> Start snort & barnyard with the system"
+	while true; do
+		echo -ne "\n\t${YELLOW}[!] IMPORTANT:${NOCOLOR} Would you like to create a service ${BOLD}snort${NOCOLOR}? [Y/n] "
+		read OPTION
+		case $OPTION in
+			Y|y )	
+				service_add
+				sudo update-rc.d snort defaults
+				echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Now you can run ${BOLD}sudo service snort {start|stop|status}${NOCOLOR}.\n\n"
+				break
+				;;
+			N|n )
+				echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} The service ${BOLD}snort${NOCOLOR} won't be created.\n\n"
+				break
+				;;
+			* )
+				echo -ne "\n\t${RED}[-] ERROR:${NOCOLOR} Invalid option.\n\n"
+				;;
+		esac
+	done
+
+	if [ -f /etc/snort/pulledpork.conf ]; then
+		while true; do
+			echo -ne "\n\t${YELLOW}[!] IMPORTANT:${NOCOLOR} Would you like to download new rules using ${BOLD}PULLEDPORK${NOCOLOR}? [Y/n] "
+			read OPTION
+			case $OPTION in
+				Y|y )	
+					sudo pulledpork.pl -c /etc/snort/pulledpork.conf -i disablesid.conf -T -H
+					break
+					;;
+				N|n )
+					echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} The service ${BOLD}snort${NOCOLOR} won't be created.\n\n"
+					break
+					;;
+				* )
+					echo -ne "\n\t${RED}[-] ERROR:${NOCOLOR} Invalid option.\n\n"
+					;;
+			esac
+		done
+	fi
+
+	while true; do
+		echo -ne "\n\t${YELLOW}[!] IMPORTANT:${NOCOLOR} Would you like to ${BOLD}REBOOT${NOCOLOR} now? [Y/n] "
+		read OPTION
+		case $OPTION in
+			Y|y )	
+				echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Rebooting...\n\n"
+				sleep 1
+				sudo reboot
+				break
+				;;
+			N|n )
+				echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Exiting from the installer. Enjoy ${BOLD}SNORT${NOCOLOR}!\n\n"
+				break
+				;;
+			* )
+				echo -ne "\n\t${RED}[-] ERROR:${NOCOLOR} Invalid option.\n\n"
+				;;
+		esac
+	done
+
+}
+
+function service_add() {
+
+	if [ -f /etc/snort/barnyard2.conf ]; then
+sudo chmod 777 /etc/init.d
+sudo echo """
+#!/bin/bash
+# /etc/init.d/snort
+
+### BEGIN INIT INFO
+# Provides:          snortblaster
+# Required-Start:    \$remote_fs \$syslog
+# Required-Stop:     \$remote_fs \$syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Example initscript
+# Description:       This service is used to start snort
+### END INIT INFO
+
+
+case '\$1' in
+    start)
+        echo 'Starting Snort in IDS mode'
+        /usr/local/bin/snort -q -u snort -g snort -c /etc/snort/snort.conf -i $INTERFACE &
+        /usr/local/bin/barnyard2 -c /etc/snort/barnyard2.conf -d /var/log/snort -f snort.u2 -w /var/log/snort/barnyard2.waldo -g snort -u snort &
+        ;;
+    stop)
+        echo 'Stopping Snort'
+        killall snort
+        ;;
+
+    *)
+        echo 'Usage: /etc/init.d/snort start|stop'
+        exit 1
+        ;;
+esac
+
+exit 0
+
+""" > /etc/init.d/snort
+sudo chmod +x /etc/init.d/snort
+
+	elif [ ! -f /etc/snort/barnyard2.conf ]; then
+
+sudo chmod  777 /etc/init.d
+sudo echo """
+#!/bin/bash
+# /etc/init.d/snort
+
+### BEGIN INIT INFO
+# Provides:          snortblaster
+# Required-Start:    \$remote_fs \$syslog
+# Required-Stop:     \$remote_fs \$syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Example initscript
+# Description:       This service is used to start snort
+### END INIT INFO
+
+
+case '\$1' in
+    start)
+        echo 'Starting Snort in IDS mode'
+        /usr/local/bin/snort -q -u snort -g snort -c /etc/snort/snort.conf -i $INTERFACE &
+        ;;
+    stop)
+        echo 'Stopping Snort'
+        killall snort
+        ;;
+
+    *)
+        echo 'Usage: /etc/init.d/snort start|stop'
+        exit 1
+        ;;
+esac
+
+exit 0
+
+""" > /etc/init.d/snort
+sudo chmod +x /etc/init.d/snort
+
+	fi
 
 }
 
@@ -342,25 +473,9 @@ function last_steps() {
 	echo -ne "\n\t${YELLOW}[!] EXAMPLE:${NOCOLOR} If you want to enable the ${BOLD}Exploit rules${NOCOLOR}, remove the ${RED}${BOLD}#${NOCOLOR}:"
 	echo -ne "\n\t\t${RED}#${NOCOLOR}include \$RULE_PATH/exploit.rules ${GREEN}-->${NOCOLOR} include \$RULE_PATH/exploit.rules\n\n"
 
-
 }
 
-function system_start(){
-
-	echo "ASK start system"
-	echo -ne "\n\t${GREEN}[+] INFO:${NOCOLOR} Starting ${BOLD}PULLEDPORK${NOCOLOR} to download latest ruleset...\n"
-	pulledpork.pl -c /etc/snort/pulledpork.conf -i disablesid.conf -T -H
-	echo -ne "\n\t${GREEN}[+] INFO:${NOCOLOR} Checking ruleset. Starting ${BOLD}SNORT${NOCOLOR} in test mode...\n"
-	sudo snort -T -c /etc/snort/snort.conf
-	echo -ne "\n\t${GREEN}[+] INFO:${NOCOLOR} Starting ${BOLD}SNORT${NOCOLOR} and ${BOLD}BARNYARD2${NOCOLOR}...\n"
-	sudo barnyard2 -c /etc/snort/barnyard2.conf -d /var/log/snort -f snort.u2 -w /var/log/snort/barnyard2.waldo -g snort -u snort &
-	sudo /usr/local/bin/snort -q -u snort -g snort -c /etc/snort/snort.conf -i $INTERFACE 
-
-	echo -ne "\n\t${GREEN}[+] SUCCESS:${NOCOLOR} ${BOLD}SNORT${NOCOLOR} and ${BOLD}BARNYARD2${NOCOLOR} running in the system!\n\n"
-
-}
-
-function banner(){
+function banner() {
 
 	echo -ne """
 	                ,-,------,	
@@ -376,7 +491,7 @@ function banner(){
 
 }
 
-function help_usage(){
+function help_usage() {
 	
 	echo -ne "\n\t\t${YELLOW}USAGE:${NOCOLOR} $0 -i ${GREEN}INTERFACE${NOCOLOR}"
 	echo -ne "\n\t\t${YELLOW}USAGE:${NOCOLOR} $0 -o ${GREEN}OINKCODE${NOCOLOR} -i ${GREEN}INTERFACE${NOCOLOR}"
@@ -393,8 +508,7 @@ function main() {
 	snort_test
 	barnyard2_ask
 	pulledpork_ask
-	#service_create
-	#system_start
+	service_create
 	last_steps
 
 }
