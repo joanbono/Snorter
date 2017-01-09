@@ -54,6 +54,7 @@ Dockerfile content. Use your personal [OINKCODE](https://www.snort.org/oinkcodes
 
 ~~~~
 #Kali docker with SNORT + BARNYARD2 + PULLEDPORK
+#Version 0.1.0
 From kalilinux/kali-linux-docker:latest
 MAINTAINER Joan Bono <@joan_bono> && Alvaro Diaz <@alvarodh5>
 
