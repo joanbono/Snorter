@@ -40,7 +40,7 @@ bash Snorter.sh --help
 RECOMMENDED: Executing the script using an [OINKCODE](https://www.snort.org/oinkcodes)
 
 ~~~~bash
-bash Snorter.sh <oinkcode>
+bash Snorter.sh -o <oinkcode> -i <interface>
 ~~~~
 
 ![Snorter in action!](img/1.png)
