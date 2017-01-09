@@ -2,7 +2,7 @@
 # Title: Snorter.sh
 # Description: Install automatically Snort + Barnyard2 + PulledPork
 # Author: Joan Bono (@joan_bono)
-# Version: 0.9.1
+# Version: 0.9.5
 # Last Modified: jbono @ 20170109
 
 RED='\033[0;31m'
@@ -386,7 +386,7 @@ function service_create() {
 function service_add() {
 
 	if [ -f /etc/snort/barnyard2.conf ]; then
-sudo chmod -R 766 /etc/init.d
+sudo chmod 777 /etc/init.d
 sudo echo """
 #!/bin/bash
 # /etc/init.d/snort
@@ -426,7 +426,7 @@ sudo chmod +x /etc/init.d/snort
 
 	elif [ ! -f /etc/snort/barnyard2.conf ]; then
 
-sudo chmor -R 766 /etc/init.d
+sudo chmod  777 /etc/init.d
 sudo echo """
 #!/bin/bash
 # /etc/init.d/snort
