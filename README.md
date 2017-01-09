@@ -12,6 +12,8 @@ Successfully tested in:
 
 ##Installation
 
+Detailed Installation instructions in this [PDF](doc/Instructions_EN.pdf)
+
 ###Download
 
 Simply run on your terminal:
