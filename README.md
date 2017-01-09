@@ -43,7 +43,7 @@ RECOMMENDED: Executing the script using an [OINKCODE](https://www.snort.org/oink
 bash Snorter.sh <oinkcode>
 ~~~~
 
-![Snorter in action!](https://github.com/joanbono/SnortBot/blob/master/img/snorter.jpg)
+![Snorter in action!](img/1.png)
 
 ***
 
