@@ -12,7 +12,7 @@ Successfully tested in:
 
 ##Installation
 
-Detailed Installation instructions in this [PDF](doc/Instructions_EN.pdf) or this [MarkDown](doc/INSTALL.md).
+Detailed Installation instructions in this [PDF](doc/Instructions_EN.pdf) or this [MarkDown](doc/doc_EN.md).
 
 ###Download
 
