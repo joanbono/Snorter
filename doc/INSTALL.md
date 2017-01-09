@@ -46,7 +46,7 @@ bash Snorter.sh -o <oinkcode> -i <interface>
 Ex: bash Snorter.sh -o XXXXXXXXXXXXX -i eth0
 ~~~
 
-- **Not Recommended**: Execute the program whitout an **oinkcode** 
+- **Not Recommended**: Execute the program without an **oinkcode** 
 
 ~~~bash
 bash Snorter.sh -i interface
