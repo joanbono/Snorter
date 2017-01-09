@@ -75,7 +75,7 @@ docker build SnorterDock
 
 ##TODO
 
-+ [ ] Add a service to `/etc/init.d/snort`.
-+ [ ] Initialize `Snort` with the system boot.
-+ [ ] Detailed installation instructions (PDF?).
++ [x] Add a service to `/etc/init.d/snort`.
++ [x] Initialize `Snort` with the system boot.
++ [x] Detailed installation instructions (PDF?).
 + [x] [Dockerfile](https://github.com/joanbono/Snorter/blob/master/src/SnorterDock/Dockerfile).
