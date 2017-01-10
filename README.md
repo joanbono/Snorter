@@ -83,3 +83,4 @@ docker build SnorterDock -e OINKCODE=<oinkcode> -e INTERFACE=<interface>
 
 + English: [PDF](doc/Instructions_EN.pdf)  -  [MarkDown](doc/doc_EN.md)
 + Spanish: [PDF](doc/Instructions_ES.pdf)  -  [MarkDown](doc/doc_ES.md)
++ Catalan: [PDF](doc/Instructions_CA.pdf)  -  [MarkDown](doc/doc_CA.md)
