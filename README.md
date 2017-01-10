@@ -12,7 +12,7 @@ Successfully tested in:
 
 ##Installation
 
-Detailed Installation instructions in this [PDF](doc/Instructions_EN.pdf) or this [MarkDown](doc/doc_EN.md).
+Detailed install [instructions](https://github.com/joanbono/Snorter#install-instructions).
 
 ###Download
 
