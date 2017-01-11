@@ -2,8 +2,8 @@
 # Title: Snorter.sh
 # Description: Install automatically Snort + Barnyard2 + PulledPork
 # Author: Joan Bono (@joan_bono)
-# Version: 0.9.5
-# Last Modified: jbono @ 20170109
+# Version: 0.9.6
+# Last Modified: jbono @ 20170111
 
 RED='\033[0;31m'
 ORANGE='\033[0;205m'
@@ -361,27 +361,9 @@ function service_create() {
 		done
 	fi
 
-	while true; do
-		echo -ne "\n\t${YELLOW}[!] IMPORTANT:${NOCOLOR} Would you like to ${BOLD}REBOOT${NOCOLOR} now? [Y/n] "
-		read OPTION
-		case $OPTION in
-			Y|y )	
-				echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Rebooting...\n\n"
-				sleep 1
-				sudo reboot
-				break
-				;;
-			N|n )
-				echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Exiting from the installer. Enjoy ${BOLD}SNORT${NOCOLOR}!\n\n"
-				break
-				;;
-			* )
-				echo -ne "\n\t${RED}[-] ERROR:${NOCOLOR} Invalid option.\n\n"
-				;;
-		esac
-	done
 
 }
+
 
 function service_add() {
 
@@ -467,12 +449,89 @@ sudo chmod +x /etc/init.d/snort
 
 }
 
+function websnort_ask() {
+
+	echo -ne "\n\t${YELLOW}[!] IMPORTANT:${NOCOLOR} Would you like to install ${BOLD}WEBSNORT${NOCOLOR} for PCAP Analysis? [Y/n] "
+	while true; do
+		read OPTION
+		case $OPTION in
+			Y|y )
+				websnort_install
+				break
+				;;
+			N|n )
+				echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} ${BOLD}WEBSNORT${NOCOLOR} won't be installed.\n\n"
+				break
+				;;
+			* )
+				echo -ne "\n\t${RED}[-] ERROR:${NOCOLOR} Invalid option.\n\n"
+				;;
+		esac
+	done
+
+}
+
+function websnort_install() {
+	
+	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Installing dependencies.\n\n"
+	sudo apt-get install -y --force-yes python-pip
+	sudo pip install websnort > /dev/null 2>&1
+	
+	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} running ${BOLD}WEBSNORT${NOCOLOR} on ${BOLD}http://localhost:80${NOCOLOR}.\n\n"
+	sudo websnort -p 80 > /dev/null 2>&1 &
+
+	echo -ne "\n\t${YELLOW}[!] IMPORTANT:${NOCOLOR} Would you like to start ${BOLD}WEBSNORT${NOCOLOR} with the system? [Y/n] "
+	while true; do
+		read OPTION
+		case $OPTION in
+			Y|y )
+				echo "sudo websnort -p 80 > /dev/null 2>&1 &" >> $HOME/.bashrc
+				break
+				;;
+			N|n )
+				echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} ${BOLD}WEBSNORT${NOCOLOR} won't start at system boot."
+				echo -ne "\n\t${YELLOW}[!] INFO:${NOCOLOR} run ${BOLD}sudo websnort -p 80${NOCOLOR} everytime you need ${BOLD}WEBSNORT${NOCOLOR}."
+				break
+				;;
+			* )
+				echo -ne "\n\t${RED}[-] ERROR:${NOCOLOR} Invalid option.\n\n"
+				;;
+		esac
+	done
+	
+	echo -ne "\n\t${GREEN}[+] INFO:${NOCOLOR} ${BOLD}WEBSNORT${NOCOLOR} is successfully installed and configured!"
+
+}
+
 function last_steps() {
 
 	echo -ne "\n\t${YELLOW}[!] IMPORTANT:${NOCOLOR} Now edit your ${BOLD}/etc/snort/snort.conf${NOCOLOR} and enable the rules you need by uncomment the lines"
 	echo -ne "\n\t${YELLOW}[!] EXAMPLE:${NOCOLOR} If you want to enable the ${BOLD}Exploit rules${NOCOLOR}, remove the ${RED}${BOLD}#${NOCOLOR}:"
 	echo -ne "\n\t\t${RED}#${NOCOLOR}include \$RULE_PATH/exploit.rules ${GREEN}-->${NOCOLOR} include \$RULE_PATH/exploit.rules\n\n"
 
+}
+
+function system_reboot() {
+
+	while true; do
+		echo -ne "\n\t${YELLOW}[!] IMPORTANT:${NOCOLOR} Would you like to ${BOLD}REBOOT${NOCOLOR} now? [Y/n] "
+		read OPTION
+		case $OPTION in
+			Y|y )	
+				echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Rebooting...\n\n"
+				sleep 1
+				sudo reboot
+				break
+				;;
+			N|n )
+				echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Exiting from the installer. Enjoy ${BOLD}SNORT${NOCOLOR}!\n\n"
+				break
+				;;
+			* )
+				echo -ne "\n\t${RED}[-] ERROR:${NOCOLOR} Invalid option.\n\n"
+				;;
+		esac
+	done
 }
 
 function banner() {
@@ -509,7 +568,9 @@ function main() {
 	barnyard2_ask
 	pulledpork_ask
 	service_create
+	websnort_ask
 	last_steps
+	system_reboot
 
 }
 
