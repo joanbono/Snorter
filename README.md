@@ -70,7 +70,17 @@ WORKDIR /opt/Snorter
 
 ###Run the dockerfile
 
-Start the `docker` daemon and run:
+Start the `docker` daemon.
+
++ With `websnort`:
+
+~~~~
+cd Snorter/src/
+docker build SnorterDock -p 80:80 -e OINKCODE=<oinkcode> -e INTERFACE=<interface>
+~~~~
+
+
++ Without `websnort`:
 
 ~~~~
 cd Snorter/src/
