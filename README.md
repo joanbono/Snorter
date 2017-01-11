@@ -1,6 +1,11 @@
 #Snorter
 
-Tricky script which mades Snort installation simply as a script execution is.
+Tricky script which mades Snort installation simply as a script execution is. The script installs:
+
++ [Snort](https://snort.org/): Open Source IDS.
++ [Barnyard2](https://github.com/firnsy/barnyard2): Interpreter for Snort unified2 binary output files.
++ [PulledPork](https://github.com/shirkdog/pulledpork): Snort rule management.
++ [WebSnort](https://github.com/shendo/websnort): Web Interface for PCAP analysis.
 
 Successfully tested in:
 
