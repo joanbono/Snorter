@@ -1,4 +1,4 @@
-#Snorter
+# Snorter
 
 Tricky script which mades Snort installation simply as a script execution is. The script installs:
 
@@ -15,11 +15,11 @@ Successfully tested in:
 
 ***
 
-##Installation
+## Installation
 
 Detailed install [instructions](https://github.com/joanbono/Snorter#install-instructions).
 
-###Download
+### Download
 
 Simply run on your terminal:
 
@@ -28,7 +28,7 @@ git clone https://github.com/joanbono/Snorter.git
 cd Snorter/src
 ~~~~
 
-###Execution
+### Execution
 
 Printing the USAGE:
 
@@ -52,7 +52,7 @@ bash Snorter.sh -o <oinkcode> -i <interface>
 
 ***
 
-##Docker
+## Docker
 ###Edit the Dockerfile
 
 Dockerfile content. Use your personal [OINKCODE](https://www.snort.org/oinkcodes).
@@ -73,7 +73,7 @@ USER root
 WORKDIR /opt/Snorter
 ~~~~
 
-###Run the dockerfile
+### Run the dockerfile
 
 Start the `docker` daemon.
 
@@ -94,7 +94,7 @@ docker build SnorterDock -e OINKCODE=<oinkcode> -e INTERFACE=<interface>
 
 ***
 
-##Install Instructions
+## Install Instructions
 
 + English: [PDF](doc/Instructions_EN.pdf)  -  [MarkDown](doc/doc_EN.md)
 + Spanish: [PDF](doc/Instructions_ES.pdf)  -  [MarkDown](doc/doc_ES.md)
