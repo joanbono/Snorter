@@ -2,7 +2,7 @@
 # Title: Snorter.sh
 # Description: Install automatically Snort + Barnyard2 + PulledPork
 # Author: Joan Bono (@joan_bono)
-# Version: 0.9.7
+# Version: 0.9.8
 # Last Modified: jbono @ 20170403
 
 RED='\033[0;31m'
@@ -592,7 +592,7 @@ while getopts ":o:i:" OPTION; do
     esac
 done
 
-shift $((OPTION-1))
+shift $((OPTIND-1))
 
 if [ -z "${INTERFACE}" ] ; then
 
