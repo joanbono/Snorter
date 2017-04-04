@@ -1,3 +1,6 @@
+
+![Snorter in action!](img/1.png)
+
 # Snorter
 
 Tricky script which mades Snort installation simply as a script execution is. The script installs:
@@ -47,8 +50,6 @@ RECOMMENDED: Executing the script using an [OINKCODE](https://www.snort.org/oink
 ~~~~bash
 bash Snorter.sh -o <oinkcode> -i <interface>
 ~~~~
-
-![Snorter in action!](img/1.png)
 
 ***
 
