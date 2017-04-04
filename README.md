@@ -53,7 +53,7 @@ bash Snorter.sh -o <oinkcode> -i <interface>
 ***
 
 ## Docker
-###Edit the Dockerfile
+### Edit the Dockerfile
 
 Dockerfile content. Use your personal [OINKCODE](https://www.snort.org/oinkcodes).
 
