@@ -1,7 +1,7 @@
 #Kali docker with SNORT + BARNYARD2 + PULLEDPORK
 #Version 0.1.0
 From kalilinux/kali-linux-docker:latest
-MAINTAINER Joan Bono <@joan_bono> && Alvaro Diaz <@alvarodh5>
+MAINTAINER Joan Bono <@joan_bono>
 
 ENV OINKCODE
 ENV INTERFACE
