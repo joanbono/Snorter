@@ -414,8 +414,8 @@ sudo echo """
 case '\$1' in
     start)
         echo 'Starting Snort in IDS mode'
-        /usr/local/bin/snort -q -u snort -g snort -c /etc/snort/snort.conf -i $INTERFACE &
-        /usr/local/bin/barnyard2 -c /etc/snort/barnyard2.conf -d /var/log/snort -f snort.u2 -w /var/log/snort/barnyard2.waldo -g snort -u snort &
+        /usr/local/bin/snort -D -q -u snort -g snort -c /etc/snort/snort.conf -i $INTERFACE &
+        /usr/local/bin/barnyard2 -D -c /etc/snort/barnyard2.conf -d /var/log/snort -f snort.u2 -w /var/log/snort/barnyard2.waldo -g snort -u snort &
         ;;
     stop)
         echo 'Stopping Snort'
@@ -454,7 +454,7 @@ sudo echo """
 case '\$1' in
     start)
         echo 'Starting Snort in IDS mode'
-        /usr/local/bin/snort -q -u snort -g snort -c /etc/snort/snort.conf -i $INTERFACE &
+        /usr/local/bin/snort -D -q -u snort -g snort -c /etc/snort/snort.conf -i $INTERFACE &
         ;;
     stop)
         echo 'Stopping Snort'
