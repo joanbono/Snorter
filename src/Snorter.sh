@@ -30,9 +30,9 @@ function snort_install() {
 	#Downloading DAQ and SNORT
 	cd $HOME && mkdir snort_src && cd snort_src
 	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Downloading ${BOLD}$DAQ${NOCOLOR}.\n\n"
-	wget -P $HOME/snort_src https://snort.org/downloads/snort/$DAQ.tar.gz
+	wget --no-check-certificate -P $HOME/snort_src https://snort.org/downloads/snort/$DAQ.tar.gz
 	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Downloading ${BOLD}$SNORT${NOCOLOR}.\n\n"
-	wget -P $HOME/snort_src https://snort.org/downloads/snort/$SNORT.tar.gz
+	wget --no-check-certificate -P $HOME/snort_src https://snort.org/downloads/snort/$SNORT.tar.gz
 	
 	#Installing DAQ
 	cd $HOME/snort_src/
