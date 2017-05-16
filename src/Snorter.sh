@@ -2,8 +2,8 @@
 # Title: Snorter.sh
 # Description: Install automatically Snort + Barnyard2 + PulledPork
 # Author: Joan Bono (@joan_bono)
-# Version: 0.9.8
-# Last Modified: jbono @ 20170403
+# Version: 0.9.9
+# Last Modified: jbono @ 20170516
 
 RED='\033[0;31m'
 ORANGE='\033[0;205m'
@@ -45,7 +45,7 @@ function snort_install() {
 	
 	#Installing SNORT
 	cd $HOME/snort_src
-	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Installing ${BOLD}$DAQ${NOCOLOR}.\n\n"
+	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Installing ${BOLD}$SNORT${NOCOLOR}.\n\n"
 	tar xvfz $SNORT.tar.gz > /dev/null 2>&1
 	rm -r *.tar.gz > /dev/null 2>&1
 	mv snort-*/ snort           
@@ -277,7 +277,8 @@ function pulledpork_install() {
 
 	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Adding ${BOLD}PULLEDPORK${NOCOLOR} to crontab. [Everyday at 4:15 AM].\n\n"
 	sudo chmod 766 /etc/crontab
-	sudo echo "15 4 * * * root pulledpork.pl -c /etc/snort/pulledpork.conf -i disablesid.conf -T -H" >> /etc/crontab
+	sudo echo "15 4 * * * root /usr/local/bin/pulledpork.pl -c /etc/snort/pulledpork.conf -i disablesid.conf -T -H" >> /etc/crontab
+	sudo echo "15 6	* * * root /usr/local/bin/ruleitor"
 	
 	sudo pulledpork.pl -V
 	echo -ne "\n\t${GREEN}[+] INFO:${NOCOLOR} ${BOLD}PULLEDPORK${NOCOLOR} is successfully installed and configured!"
@@ -316,7 +317,32 @@ function pulledpork_edit() {
 	sudo sed -i "s/# disablesid=/enablesid=/g" /etc/snort/pulledpork.conf
 	sudo sed -i "s/# modifysid=/enablesid=/g" /etc/snort/pulledpork.conf
 	sudo sed -i "s/distro=FreeBSD-8-1/distro=Debian-8-4/g" /etc/snort/pulledpork.conf
+	sudo sed -i "s/# out_path=/out_path=/g" /etc/snort/pulledpork.conf
 
+	sudo echo """
+	#!/bin/bash
+	
+	#Snort Snapshot
+	cd /tmp
+	tar -zxvf /tmp/snortrules-snapshot-*.tar.gz --strip-components=1 rules/ > /dev/null 2>&1
+	cp /tmp/rules/*.rules /etc/snort/rules/ > /dev/null 2>&1
+	rm -r /tmp/snortrules-snapshot-*.tar.gz /tmp/rules /tmp/preproc_rules /tmp/so_rules /tmp/etc > /dev/null 2>&1
+	
+	#Community Rules
+	tar -zxvf /tmp/community-rules.tar.gz > /dev/null 2>&1
+	cp /tmp/community-rules/*.rules /etc/snort/rules/ > /dev/null 2>&1
+	rm -r /tmp/community-rules* > /dev/null 2>&1
+	
+	#Emerging Threats Rules
+	tar -zxvf /tmp/emerging.rules.tar.gz > /dev/null 2>&1
+	cp /tmp/rules/*.rules /etc/snort/rules/ > /dev/null 2>&1
+	rm -r /tmp/* > /dev/null 2>&1
+	
+	#Adding permissions
+	chmod 777 /etc/snort/rules/*.rules
+	""" > /usr/local/bin/ruleitor
+	sudo chmod 777 /usr/local/bin/ruleitor
+	
 }
 
 function service_create() {
@@ -347,7 +373,8 @@ function service_create() {
 			read OPTION
 			case $OPTION in
 				Y|y )	
-					sudo pulledpork.pl -c /etc/snort/pulledpork.conf -i disablesid.conf -T -H
+					sudo /usr/local/bin/pulledpork.pl -c /etc/snort/pulledpork.conf -i disablesid.conf -T -H
+					sudo /usr/local/bin/ruleitor
 					break
 					;;
 				N|n )
