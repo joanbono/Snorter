@@ -278,7 +278,7 @@ function pulledpork_install() {
 	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Adding ${BOLD}PULLEDPORK${NOCOLOR} to crontab. [Everyday at 4:15 AM].\n\n"
 	sudo chmod 766 /etc/crontab
 	sudo echo "15 4 * * * root /usr/local/bin/pulledpork.pl -c /etc/snort/pulledpork.conf -i disablesid.conf -T -H" >> /etc/crontab
-	sudo echo "15 6	* * * root /usr/local/bin/ruleitor"
+	sudo echo "15 6	* * * root /usr/local/bin/ruleitor" >> /etc/crontab
 	
 	sudo pulledpork.pl -V
 	echo -ne "\n\t${GREEN}[+] INFO:${NOCOLOR} ${BOLD}PULLEDPORK${NOCOLOR} is successfully installed and configured!"
