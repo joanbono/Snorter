@@ -94,6 +94,24 @@ docker build SnorterDock -e OINKCODE=<oinkcode> -e INTERFACE=<interface>
 
 ***
 
+## WebSnort Usage
+
++ Submit a `pcap` using the web browser:
+
+![](img/20.png)
+
++ Watch the `alerts` on the web browser:
+
+![](img/21.png)
+
++ Submit a `pcap` using the `API`:
+
+~~~~
+curl -i --form file=@test.pcap http://ADDRESS/api/submit
+~~~~
+
+![](img/22.png)
+
 ## Install Instructions
 
 + English: [PDF](doc/Instructions_EN.pdf)  -  [MarkDown](doc/doc_EN.md)
