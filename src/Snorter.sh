@@ -631,8 +631,8 @@ fi
 if [ "$(echo ${#OINKCODE})" -eq 40 ]; then
 	
 	MACHINE=$(echo $(uname -m))
-	SNORT=$(echo $(curl -s https://www.snort.org | grep "wget" | grep -oP "snort\-\d.\d\.\d(\.\d)?"))
-	DAQ=$(echo $(curl -s https://www.snort.org | grep "wget" | grep -oP "daq\-\d\.\d\.\d"))
+	SNORT=$(echo $(curl -s -k https://www.snort.org | grep "wget" | grep -oP "snort\-\d.\d\.\d(\.\d)?"))
+	DAQ=$(echo $(curl -s -k https://www.snort.org | grep "wget" | grep -oP "daq\-\d\.\d\.\d"))
 
 	echo -ne "\n\t\t${GREEN}[+] OINKCODE:${NOCOLOR} ${OINKCODE}"
 	echo -ne "\n\t\t${GREEN}[+] INTERFACE:${NOCOLOR} ${INTERFACE}"
@@ -649,8 +649,8 @@ elif [ "$(echo ${#OINKCODE})" -lt 40 ] && [ "$(echo ${#OINKCODE})" -gt 0 ]; then
 elif [ $(echo ${#OINKCODE}) -lt 40 ] || [ $(echo ${#OINKCODE}) -gt 1 ]; then
 	
 	MACHINE=$(echo $(uname -m))
-	SNORT=$(echo $(curl -s https://www.snort.org | grep "wget" | grep -oP "snort\-\d.\d\.\d(\.\d)?"))
-	DAQ=$(echo $(curl -s https://www.snort.org | grep "wget" | grep -oP "daq\-\d\.\d\.\d"))
+	SNORT=$(echo $(curl -s -k https://www.snort.org | grep "wget" | grep -oP "snort\-\d.\d\.\d(\.\d)?"))
+	DAQ=$(echo $(curl -s -k https://www.snort.org | grep "wget" | grep -oP "daq\-\d\.\d\.\d"))
 
 	echo -ne "\n\t\t${GREEN}[+] OINKCODE:${NOCOLOR} No OINKCODE provided."
 	echo -ne "\n\t\t${GREEN}[+] INTERFACE:${NOCOLOR} ${INTERFACE}"
