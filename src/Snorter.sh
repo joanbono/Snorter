@@ -594,7 +594,7 @@ function main() {
 	snort_test
 	barnyard2_ask
 	pulledpork_ask
-	service_create
+	#service_create
 	websnort_ask
 	last_steps
 	system_reboot
