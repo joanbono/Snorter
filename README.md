@@ -114,6 +114,47 @@ curl -i --form file=@test.pcap http://ADDRESS/api/submit
 
 ***
 
+## Add Service on Kali Linux
+
+The service creation is not working on Kali Linux. To add `Snorter` as a service on Kali Linux just create a new file `/lib/systemd/system/snort.service` containing:
+
+~~~~
+[Unit]
+Description=Snort NIDS Daemon
+After=syslog.target network.target
+ 
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/snort -q -u snort -g snort -c /etc/snort/snort.conf -i eth0
+ 
+[Install]
+WantedBy=multi-user.target
+~~~~
+
+Then you have to activate the service as follows:
+
+~~~~
+systemctl enable snort.service
+systemctl start snort.service
+~~~~
+
+Finally, in order to check if `Snorter` is running:
+
+~~~~
+snort.service - Snort NIDS Daemon
+   Loaded: loaded (/lib/systemd/system/snort.service; enabled; vendor preset: disabled)
+   Active: active (running) since Thu 2017-05-18 13:15:11 BST; 7min ago
+ Main PID: 586 (snort)
+   CGroup: /system.slice/snort.service
+           └─586 /usr/local/bin/snort -q -u snort -g snort -c /etc/snort/snort.conf -i eth0
+
+May 18 13:15:11 dima systemd[1]: Started Snort NIDS Daemon.
+~~~~
+
+Thanks to [`@dimaspencer84`](https://github.com/dimaspencer84), for solving this problem.
+
+***
+
 ## Install Instructions
 
 + English: [PDF](doc/Instructions_EN.pdf)  -  [MarkDown](doc/doc_EN.md)
