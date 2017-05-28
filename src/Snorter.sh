@@ -186,7 +186,7 @@ function barnyard2_install() {
 	echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} Press ${BOLD}ENTER${NOCOLOR} to continue. "
 	read -n 1 -s
 
-	sudo apt-get install -y --force-yes mysql-server *libmysqlclient-dev mysql-client autoconf libtool libdnet checkinstall yagiuda libdnet-dev locate
+	sudo apt-get install -y --force-yes mysql-server libmysqlclient-dev mysql-client autoconf libtool libdnet checkinstall yagiuda libdnet-dev locate
 	
 	cd $HOME/snort_src
 	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Downloading ${BOLD}BARNYARD2${NOCOLOR}.\n\n"
