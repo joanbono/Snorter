@@ -353,8 +353,8 @@ function service_create() {
 		case $OPTION in
 			Y|y )	
 				service_add
-				sudo update-rc.d snort defaults
-				echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Now you can run ${BOLD}sudo service snort {start|stop|status}${NOCOLOR}.\n\n"
+				sudo systemctl enable snort && sudo systemctl enable barnyard2 
+				echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Now you can run ${BOLD}sudo systemctl {start|stop|status} snort ${NOCOLOR}.\n\n"
 				break
 				;;
 			N|n )
@@ -395,85 +395,35 @@ function service_create() {
 function service_add() {
 
 	if [ -f /etc/snort/barnyard2.conf ]; then
-sudo chmod 777 /etc/init.d
 sudo echo """
-#!/bin/bash
-# /etc/init.d/snort
+[Unit]
+Description=Barnyard2 Daemon
+After=syslog.target network.target
+ 
+[Service]
+Type=simple
+#ExecStart=/usr/local/bin/barnyard2 -c /etc/snort/barnyard2.conf -d /var/log/snort -f snort.u2 -q -w /var/log/snort/barnyard2.waldo -g snort -u snort -D -a /var/log/snort/archived_logs
+ExecStart=/usr/local/bin/barnyard2 -D -c /etc/snort/barnyard2.conf -d /var/log/snort -f snort.u2 -w /var/log/snort/barnyard2.waldo -g snort -u snort 
+ 
+[Install]
+WantedBy=multi-user.target
+""" > /lib/systemd/system/barnyard2.service
+fi
 
-### BEGIN INIT INFO
-# Provides:          snortblaster
-# Required-Start:    \$remote_fs \$syslog
-# Required-Stop:     \$remote_fs \$syslog
-# Default-Start:     2 3 4 5
-# Default-Stop:      0 1 6
-# Short-Description: Example initscript
-# Description:       This service is used to start snort
-### END INIT INFO
-
-
-case '\$1' in
-    start)
-        echo 'Starting Snort in IDS mode'
-        /usr/local/bin/snort -D -q -u snort -g snort -c /etc/snort/snort.conf -i $INTERFACE &
-        /usr/local/bin/barnyard2 -D -c /etc/snort/barnyard2.conf -d /var/log/snort -f snort.u2 -w /var/log/snort/barnyard2.waldo -g snort -u snort &
-        ;;
-    stop)
-        echo 'Stopping Snort'
-        killall snort
-        ;;
-
-    *)
-        echo 'Usage: /etc/init.d/snort start|stop'
-        exit 1
-        ;;
-esac
-
-exit 0
-
-""" > /etc/init.d/snort
-sudo chmod +x /etc/init.d/snort
-
-	elif [ ! -f /etc/snort/barnyard2.conf ]; then
-
-sudo chmod  777 /etc/init.d
 sudo echo """
-#!/bin/bash
-# /etc/init.d/snort
-
-### BEGIN INIT INFO
-# Provides:          snortblaster
-# Required-Start:    \$remote_fs \$syslog
-# Required-Stop:     \$remote_fs \$syslog
-# Default-Start:     2 3 4 5
-# Default-Stop:      0 1 6
-# Short-Description: Example initscript
-# Description:       This service is used to start snort
-### END INIT INFO
-
-
-case '\$1' in
-    start)
-        echo 'Starting Snort in IDS mode'
-        /usr/local/bin/snort -D -q -u snort -g snort -c /etc/snort/snort.conf -i $INTERFACE &
-        ;;
-    stop)
-        echo 'Stopping Snort'
-        killall snort
-        ;;
-
-    *)
-        echo 'Usage: /etc/init.d/snort start|stop'
-        exit 1
-        ;;
-esac
-
-exit 0
-
-""" > /etc/init.d/snort
-sudo chmod +x /etc/init.d/snort
-
-	fi
-
+[Unit]
+Description=Snort NIDS Daemon
+After=syslog.target network.target
+ 
+[Service]
+Type=simple
+#ExecStart=/usr/local/bin/snort -q -u snort -g snort -c /etc/snort/snort.conf -i eth0
+#ExecStart=/usr/local/bin/snort -D -q -u snort -g snort -c /etc/snort/snort.conf -i $INTERFACE &
+ExecStart=/usr/local/bin/snort -q -u snort -g snort -c /etc/snort/snort.conf -i $INTERFACE 
+ 
+[Install]
+WantedBy=multi-user.target
+""" > /lib/systemd/system/snort.service
 }
 
 function websnort_ask() {
@@ -594,7 +544,7 @@ function main() {
 	snort_test
 	barnyard2_ask
 	pulledpork_ask
-	#service_create
+	service_create
 	websnort_ask
 	last_steps
 	system_reboot
