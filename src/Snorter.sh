@@ -481,10 +481,26 @@ function websnort_install() {
 }
 
 function last_steps() {
+	
+	echo -ne "\n\t${YELLOW}[!] IMPORTANT:${NOCOLOR} Would you like to enable ${BOLD}Emerging Threats${NOCOLOR} and ${BOLD}Community${NOCOLOR} rules? [Y/n] "
 
-	echo -ne "\n\t${YELLOW}[!] IMPORTANT:${NOCOLOR} Now edit your ${BOLD}/etc/snort/snort.conf${NOCOLOR} and enable the rules you need by uncomment the lines"
-	echo -ne "\n\t${YELLOW}[!] EXAMPLE:${NOCOLOR} If you want to enable the ${BOLD}Exploit rules${NOCOLOR}, remove the ${RED}${BOLD}#${NOCOLOR}:"
-	echo -ne "\n\t\t${RED}#${NOCOLOR}include \$RULE_PATH/exploit.rules ${GREEN}-->${NOCOLOR} include \$RULE_PATH/exploit.rules\n\n"
+	read OPTION
+	case "$OPTION" in 
+		[yY][eE][sS]|[yY])
+			echo "# Community and Emerging Rules enabled" >> /etc/snort/snort.conf
+			for RULE in $(ls -l /etc/snort/rules/emerging-*.rules | awk '{print $9}'); do 
+				echo "include $RULE" >> /etc/snort/snort.conf ; 
+			done
+			echo "include /etc/snort/rules/community.rules" >> /etc/snort/snort.conf
+			sudo systemctl restart snort barnyard2
+			echo -ne "\n\t${GREEN}[+] SUCCESS:${NOCOLOR} ${BOLD}Emerging Threats${NOCOLOR} and ${BOLD}Community${NOCOLOR} rules enabled\n\n"
+        	;;
+    	*)
+      		echo -ne "\n\t${YELLOW}[!] IMPORTANT:${NOCOLOR} Edit your ${BOLD}/etc/snort/snort.conf${NOCOLOR} and enable the rules you need by uncomment the lines"
+			echo -ne "\n\t${YELLOW}[!] EXAMPLE:${NOCOLOR} If you want to enable the ${BOLD}Exploit rules${NOCOLOR}, remove the ${RED}${BOLD}#${NOCOLOR}:"
+			echo -ne "\n\t\t${RED}#${NOCOLOR}include \$RULE_PATH/exploit.rules ${GREEN}-->${NOCOLOR} include \$RULE_PATH/exploit.rules\n\n"
+        ;;
+	esac
 
 }
 
