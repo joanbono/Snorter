@@ -3,7 +3,7 @@
 # Description: Install automatically Snort + Barnyard2 + PulledPork
 # Author: Joan Bono (@joan_bono)
 # Version: 0.9.9
-# Last Modified: jbono @ 20170516
+# Last Modified: jbono @ 20170529
 
 RED='\033[0;31m'
 ORANGE='\033[0;205m'
