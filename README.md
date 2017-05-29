@@ -2,7 +2,7 @@
 
 ![Snorter in action!](img/1.png)
 
-![Version](https://img.shields.io/badge/version-0.9.9-green.svg) [![Code Climate](https://img.shields.io/codeclimate/issues/github/me-and/mdf.svg)]() [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
+![Version](https://img.shields.io/badge/version-0.9.9-green.svg) [![Code Climate](https://img.shields.io/codeclimate/issues/github/me-and/mdf.svg)](https://github.com/joanbono/Snorter/issues) [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
 
 Tricky script which mades Snort installation simply as a script execution is. The script installs:
 
