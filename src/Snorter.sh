@@ -105,7 +105,7 @@ function snort_edit() {
 	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Enabling ${BOLD}local.rules${NOCOLOR} and adding a PING detection rule..."
 	sudo sed -i 's/#include \$RULE\_PATH\/local\.rules/include \$RULE\_PATH\/local\.rules/' /etc/snort/snort.conf
 	sudo chmod 766 /etc/snort/rules/local.rules
-	sudo echo 'alert icmp any any -> $HOME_NET any (msg:"Atac per PINGs"; sid:10000001; rev:001;)' >> /etc/snort/rules/local.rules
+	sudo echo 'alert icmp any any -> $HOME_NET any (msg:"PING ATTACK"; sid:10000001; rev:001;)' >> /etc/snort/rules/local.rules
 
 	#SNORT OUTPUT: UNIFIED2 --> MANDATORY || CSV/TCPDUMP/BOTH
 	sudo sed -i 's/# unified2/output unified2: filename snort.u2, limit 128/g' /etc/snort/snort.conf
