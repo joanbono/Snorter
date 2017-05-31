@@ -482,7 +482,7 @@ function websnort_install() {
 
 function last_steps() {
 	
-	echo -ne "\n\t${YELLOW}[!] IMPORTANT:${NOCOLOR} Would you like to enable ${BOLD}Emerging Threats${NOCOLOR} and ${BOLD}Community${NOCOLOR} rules? [Y/n] "
+	echo -ne "\n\t${YELLOW}[!] IMPORTANT:${NOCOLOR} Would you like to enable ${BOLD}Emerging Threats${NOCOLOR} and ${BOLD}Community${NOCOLOR} rules for detection? [Y/n] "
 
 	read OPTION
 	case "$OPTION" in 
