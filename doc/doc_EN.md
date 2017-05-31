@@ -148,16 +148,6 @@ bash Snorter.sh -i eth0
 
 ---
 
-## **Emerging Threats** ruleset
-
-+ Do you want to add the **Emerging Threats** rules and the **community** ones (enabled by default)?
-
-![](../img/16.png)
-
-+ **Remember** to edit your `/etc/snort/snort.conf` and remove the **`#`** to enable the rules you want or the ones you need.
-
----
-
 ## `service` creation
 
 + Create a system `service`:
@@ -174,14 +164,24 @@ bash Snorter.sh -i eth0
 
 ---
 
+## Enabling `Emerging Threats` and `Community` rules
+
++ Enable at `snort.conf` the `Emerging Threats` and `Community` rules
+
+![](../img/24.png)
+
+---
+
+## WebSnort
+
++ Install WebSnort for `PCAP` analysis
+
+![](../img/23.png)
+
+---
+
 ## Reboot
 
 + Reboot the system.
 
 ![](../img/19.png)
-
----
-
-# Enjoy!
-
-> Please, feel free to open **issues** if you have any problem with the program.

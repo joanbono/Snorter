@@ -149,16 +149,6 @@ bash Snorter.sh -i eth0
 
 ---
 
-## Regles d'**Emerging Threats**
-
-+ Vols afegir les regles d'**Emerging Threats** junt a las regles **community** (s'instal·l´n per defecte)?
-
-![](../img/16.png)
-
-+ **Recorda** editar l'arxiu `/etc/snort/snort.conf` i borra el **`#`** per habilitar las regles que necessites.
-
----
-
 ## Crear un `servei`
 
 + Crear un `servei` del sistema:
@@ -175,14 +165,23 @@ bash Snorter.sh -i eth0
 
 ---
 
+## Habilitar regles `Emerging Threats` i `Community` 
+
++ Habilitar automàticamente al `snort.conf` les regles d'`Emerging Threats` i `Community`
+
+![](../img/24.png)
+
+---
+
+## WebSnort
+
++ Instal·lar WebSnort per analitzar `PCAPs`
+
+![](../img/23.png)
+
+---
 ## Reiniciar
 
 + Reiniciar el sistema.
 
 ![](../img/19.png)
-
----
-
-# A disfrutar!
-
-> Per favor, s'agraeix que s'obriga **issues** si es troba cap error al programa.
