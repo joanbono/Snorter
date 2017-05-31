@@ -463,6 +463,7 @@ function websnort_install() {
 		case $OPTION in
 			Y|y )
 				echo "sudo websnort -p 80 > /dev/null 2>&1 &" >> $HOME/.bashrc
+				echo -ne "\n\t${GREEN}[+] INFO:${NOCOLOR} ${BOLD}WEBSNORT${NOCOLOR} is successfully installed and configured!\n\n"
 				break
 				;;
 			N|n )
@@ -476,7 +477,6 @@ function websnort_install() {
 		esac
 	done
 	
-	echo -ne "\n\t${GREEN}[+] INFO:${NOCOLOR} ${BOLD}WEBSNORT${NOCOLOR} is successfully installed and configured!"
 
 }
 
