@@ -121,7 +121,7 @@ function snort_edit() {
 				;;
 			2 )
 				echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} ${BOLD}TCPdump${NOCOLOR} output will be configured\n"
-				sudo sed -i 's/# pcap/output log_tcpdump: \/var\/log\/snort\/snort.log/g' /etc/snort/snort.conf
+				sudo sed -i 's/# pcap/output log_tcpdump: snort.log/g' /etc/snort/snort.conf
 				break
 				;;
 			3 )
