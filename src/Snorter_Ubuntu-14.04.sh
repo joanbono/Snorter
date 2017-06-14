@@ -2,8 +2,10 @@
 # Title: Snorter.sh
 # Description: Install automatically Snort + Barnyard2 + PulledPork
 # Author: Joan Bono (@joan_bono)
+# Contributor: Md. Nazrul Islam (@rbshadow)
 # Version: 1.0.0
 # Last Modified: jbono @ 20170531
+# Last Modified: rbshadow @ 20170615
 
 RED='\033[0;31m'
 ORANGE='\033[0;205m'
@@ -22,13 +24,31 @@ function update_upgrade() {
 	
 }
 
+function nghttp_insatll() {
+
+	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Installing development libraries. \n\n"
+	sudo apt-get install -y --force-yes autoconf libtool pkg-config
+	cd $HOME && mkdir snort_src && cd snort_src
+	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Downloading Nghttp${BOLD}$NGHTTP2${NOCOLOR}.\n\n"
+	wget --no-check-certificate -P $HOME/snort_src https://github.com/nghttp2/nghttp2/releases/download/v1.23.1/nghttp2-1.23.1.tar.gz
+	cd $HOME/snort_src/
+	tar -xzvf nghttp2-1.23.1.tar.gz
+	cd nghttp2-1.23.1
+	autoreconf -i --force
+	automake
+	autoconf
+	./configure --enable-lib-only
+	make
+	sudo make install
+}
+
 function snort_install() {
 
 	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Installing dependencies.\n\n"
-	sudo apt-get install -y --force-yes build-essential libpcap-dev libpcre3-dev libdumbnet-dev bison flex zlib1g-dev git locate vim
+	sudo apt-get install -y --force-yes build-essential libpcap-dev libpcre3-dev libdumbnet-dev bison flex zlib1g-dev git locate vim libluajit-5.1-dev pkg-config openssl libssl-dev
 	
 	#Downloading DAQ and SNORT
-	cd $HOME && mkdir snort_src && cd snort_src
+	cd $HOME/snort_src/
 	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Downloading ${BOLD}$DAQ${NOCOLOR}.\n\n"
 	wget --no-check-certificate -P $HOME/snort_src https://snort.org/downloads/snort/$DAQ.tar.gz
 	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Downloading ${BOLD}$SNORT${NOCOLOR}.\n\n"
@@ -44,13 +64,13 @@ function snort_install() {
 	echo -ne "\n\t${GREEN}[+] INFO:${NOCOLOR} ${BOLD}$DAQ${NOCOLOR} installed successfully.\n\n"
 	
 	#Installing SNORT
-	cd $HOME/snort_src
+	cd $HOME/snort_src/
 	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Installing ${BOLD}$SNORT${NOCOLOR}.\n\n"
 	tar xvfz $SNORT.tar.gz > /dev/null 2>&1
 	rm -r *.tar.gz > /dev/null 2>&1
 	mv snort-*/ snort           
 	cd snort
-	./configure --enable-sourcefire && make && sudo make install
+	./configure --enable-sourcefire --enable-open-appid && make && sudo make install
 	echo -ne "\n\t${GREEN}[+] INFO:${NOCOLOR} ${BOLD}$SNORT${NOCOLOR} installed successfully.\n\n"
 	cd ..
 	
@@ -82,7 +102,24 @@ function snort_install() {
 	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} /var/log/snort and /etc/snort created and configurated.\n\n"
 	sudo /usr/local/bin/snort -V
 	echo -ne "\n\t${GREEN}[+] INFO:${NOCOLOR} ${BOLD}SNORT${NOCOLOR} is successfully installed and configurated!"
-
+	
+	#Installing OpenAppID
+	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Installing ${BOLD}$OpenAppID${NOCOLOR}.\n\n"
+	cd $HOME/snort_src/
+	wget --no-check-certificate -P $HOME/snort_src/ https://snort.org/downloads/openappid/5411 -O snort-openappid.tar.gz
+	sudo mkdir openappid 
+	mv snort-open* $HOME/snort_src/openappid	
+	cd $HOME/snort_src/openappid	
+	tar -xvzf snort-openappid.tar.gz
+	rm -r *.tar.gz > /dev/null 2>&1
+	
+	#Moving files and Create a directory for thirdparty developed apps detector
+	sudo cp -r $HOME/snort_src/openappid/odp/ /etc/snort/rules
+	sudo mkdir /usr/local/lib/thirdparty	
+	
+	
+	
+	
 }
 
 function snort_edit() {
@@ -97,13 +134,14 @@ function snort_edit() {
 	echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} Press ${BOLD}ENTER${NOCOLOR} to continue. "
 	read -n 1 -s
 	sudo vim /etc/snort/snort.conf -c "/ipvar EXTERNAL_NET"
-
+	echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} Press ${BOLD}ENTER${NOCOLOR} to continue. "
 	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Adding ${BOLD}RULE_PATH${NOCOLOR} to snort.conf file"
 	sudo sed -i 's/RULE_PATH\ \.\.\//RULE_PATH\ \/etc\/snort\//g' /etc/snort/snort.conf
 	sudo sed -i 's/_LIST_PATH\ \.\.\//_LIST_PATH\ \/etc\/snort\//g' /etc/snort/snort.conf
 
 	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Enabling ${BOLD}local.rules${NOCOLOR} and adding a PING detection rule..."
 	sudo sed -i 's/#include \$RULE\_PATH\/local\.rules/include \$RULE\_PATH\/local\.rules/' /etc/snort/snort.conf
+	sed -i "513i preprocessor appid: app_stats_filename appstats-u2.log, app_stats_period 60, app_detector_dir /etc/snort/rules" /etc/snort/snort.conf
 	sudo chmod 766 /etc/snort/rules/local.rules
 	sudo echo 'alert icmp any any -> $HOME_NET any (msg:"PING ATTACK"; sid:10000001; rev:001;)' >> /etc/snort/rules/local.rules
 
@@ -111,7 +149,7 @@ function snort_edit() {
 	sudo sed -i 's/# unified2/output unified2: filename snort.u2, limit 128/g' /etc/snort/snort.conf
 	
 	while true; do
-		echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} Unified2 output configured. Configure another output?\n\t\t${YELLOW}1${NOCOLOR} - ${BOLD}CSV${NOCOLOR} output\n\t\t${YELLOW}2${NOCOLOR} - ${BOLD}TCPdump${NOCOLOR} output\n\t\t${YELLOW}3${NOCOLOR} - ${BOLD}CSV${NOCOLOR} and ${BOLD}TCPdump${NOCOLOR} output\n\t\t${YELLOW}4${NOCOLOR} - ${BOLD}None${NOCOLOR}\n\n\tOption [1-4]: "
+		echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} Unified2 output configured. Configure another output?\n\t\t${YELLOW}1${NOCOLOR} - ${BOLD}CSV${NOCOLOR} output\n\t\t${YELLOW}2${NOCOLOR} - ${BOLD}TCPdump${NOCOLOR} output\n\t\t${YELLOW}3${NOCOLOR} - ${BOLD}CSV${NOCOLOR} and ${BOLD}TCPdump${NOCOLOR} output\n\t\t${YELLOW}4${NOCOLOR} - ${BOLD}CSV${NOCOLOR}, ${BOLD}TCPdump${NOCOLOR} and ${BOLD}OpenAppID${NOCOLOR} output\n\t\t${YELLOW}5${NOCOLOR} - ${BOLD}None\n\t\t${NOCOLOR}[1-5]: "
 		read OPTION
 		case $OPTION in
 			1 )
@@ -124,13 +162,19 @@ function snort_edit() {
 				sudo sed -i 's/# pcap/output log_tcpdump: \/var\/log\/snort\/snort.log/g' /etc/snort/snort.conf
 				break
 				;;
-			3 )
-				echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} ${BOLD}CSV${NOCOLOR} and ${BOLD}TCPdump${NOCOLOR} output will be configured\n"
+			3 ) 
+				echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} ${BOLD}OpenAppID${NOCOLOR} output will be configured.\n"
+				sudo sed -i 's/# output unified2: filename merged.log, limit 128, nostamp, mpls_event_types, vlan_event_types/output unified2: filename \/var\/log\/snort\/snortOaid.log, limit 128, appid_event_types/g' /etc/snort/snort.conf
+				break
+				;;	
+			4 )
+				echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} ${BOLD}CSV${NOCOLOR} , ${BOLD}TCPdump${NOCOLOR} and ${BOLD}OpenAppID${NOCOLOR} output will be configured\n"
 				sudo sed -i 's/# syslog/output alert_csv: \/var\/log\/snort\/alert.csv default/g' /etc/snort/snort.conf
 				sudo sed -i 's/# pcap/output log_tcpdump: \/var\/log\/snort\/snort.log/g' /etc/snort/snort.conf
+				sudo sed -i 's/# output unified2: filename merged.log, limit 128, nostamp, mpls_event_types, vlan_event_types/output unified2: filename \/var\/log\/snort\/snortOaid.log, limit 128, appid_event_types/g' /etc/snort/snort.conf
 				break
 				;;
-			4 )
+			5 )
 				echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} No other output will be configured\n\n"
 				break
 				;;
@@ -207,7 +251,6 @@ function barnyard2_install() {
 		
 	make
 	sudo make install
-	
 	echo -ne "\n\t${GREEN}[+] INFO:${NOCOLOR} ${COLOR}BARNYARD2${NOCOLOR} installed successfully.\n\n"
 	
 	sudo cp etc/barnyard2.conf /etc/snort > /dev/null 2>&1
@@ -232,6 +275,7 @@ function barnyard2_install() {
 	sudo chmod o-r /etc/snort/barnyard2.conf
 	
 	barnyard2 -V
+	rm -rf $HOME/snort_src/barnyard2 > /dev/null 2>&1
 	echo -ne "\n\t${GREEN}[+] INFO:${NOCOLOR} ${BOLD}BARNYARD2${NOCOLOR} is successfully installed and configurated!"
 
 }
@@ -543,6 +587,7 @@ function help_usage() {
 function main() {
 
 	update_upgrade
+	nghttp_insatll
 	snort_install
 	snort_edit
 	snort_test
