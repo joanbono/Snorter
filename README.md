@@ -53,6 +53,12 @@ RECOMMENDED: Executing the script using an [OINKCODE](https://www.snort.org/oink
 bash Snorter.sh -o <oinkcode> -i <interface>
 ~~~~
 
+It's possible to add the `OpenAppID` feature by adding the `-a` flag:
+
+~~~~bash
+bash Snorter.sh -o <oinkcode> -i <interface> -a
+~~~~
+
 ***
 
 ## Docker
