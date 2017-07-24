@@ -74,7 +74,7 @@ function snort_install() {
 	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Downloading ${BOLD}$SNORT${NOCOLOR}.\n\n"
 	wget --no-check-certificate -P $HOME/snort_src https://snort.org/downloads/snort/$SNORT.tar.gz
 	
-	if [ -z "${OPENAPPID}" ] ; then
+	if [ ! -z "${OPENAPPID}" ] ; then
 		nghttp_install
 	fi
 	
@@ -129,7 +129,7 @@ function snort_install() {
 	sudo /usr/local/bin/snort -V
 	echo -ne "\n\t${GREEN}[+] INFO:${NOCOLOR} ${BOLD}SNORT${NOCOLOR} is successfully installed and configurated!"
 
-	if [ -z "${OPENAPPID}" ] ; then
+	if [ ! -z "${OPENAPPID}" ] ; then
 		install_openappid
 	fi
 
