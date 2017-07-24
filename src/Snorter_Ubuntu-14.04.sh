@@ -4,7 +4,7 @@
 # Author: Joan Bono (@joan_bono)
 # Contributor: Md. Nazrul Islam (@rbshadow)
 # Version: 1.1.0
-# Last Modified: jbono @ 20170721
+# Last Modified: jbono @ 20170724
 
 
 RED='\033[0;31m'
