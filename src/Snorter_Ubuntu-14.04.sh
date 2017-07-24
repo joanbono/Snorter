@@ -74,8 +74,7 @@ function snort_install() {
 	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Downloading ${BOLD}$SNORT${NOCOLOR}.\n\n"
 	wget --no-check-certificate -P $HOME/snort_src https://snort.org/downloads/snort/$SNORT.tar.gz
 
-	echo $OPENAPPID > /tmp/TEST_OPENAPP_001.txt
-	
+	#TESTING	
 	clear && echo "OPENAPPID VALUE: " &&  echo $OPENAPPID && exit 0
 
 	if [ "${OPENAPPID}" = "--enable-open-appid" ] ; then
