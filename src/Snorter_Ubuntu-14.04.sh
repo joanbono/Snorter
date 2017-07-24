@@ -73,6 +73,8 @@ function snort_install() {
 	wget --no-check-certificate -P $HOME/snort_src https://snort.org/downloads/snort/$DAQ.tar.gz
 	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Downloading ${BOLD}$SNORT${NOCOLOR}.\n\n"
 	wget --no-check-certificate -P $HOME/snort_src https://snort.org/downloads/snort/$SNORT.tar.gz
+
+	echo $OPENAPPID > /tmp/TEST_OPENAPP_001.txt
 	
 	if [ "$OPENAPPID" = "--enable-open-appid" ] ; then
 		nghttp_install
@@ -620,7 +622,7 @@ function main() {
 
 banner
 
-while getopts ":o:i:a" OPTION; do
+while getopts ":o:i:a:" OPTION; do
     case "${OPTION}" in
         o)
             OINKCODE=${OPTARG}
