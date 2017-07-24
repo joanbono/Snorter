@@ -76,7 +76,7 @@ function snort_install() {
 
 	echo $OPENAPPID > /tmp/TEST_OPENAPP_001.txt
 	
-	clear && echo $OPENAPPID && exit 0
+	clear && echo "OPENAPPID VALUE: " &&  echo $OPENAPPID && exit 0
 
 	if [ "${OPENAPPID}" = "--enable-open-appid" ] ; then
 		nghttp_install
