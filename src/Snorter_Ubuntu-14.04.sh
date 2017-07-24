@@ -631,7 +631,7 @@ while getopts ":o:i:a:" OPTION; do
             INTERFACE=${OPTARG}
             ;;
         a)
-	   OPENAPPID="--enable-open-appid"
+	   OPENAPPID=${OPTARG}
 	   ;;
         *)
             help_usage
