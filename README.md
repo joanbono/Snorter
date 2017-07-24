@@ -15,7 +15,8 @@ Successfully tested in:
 
 + Raspberry Pi + Raspbian Jessie
 + Kali Linux Rolling Release
-+ Debian 8.5
++ Debian 8.0+
++ Ubuntu 14.04 using the [`Snorter_Ubuntu-14.04.sh`](src/Snorter_Ubuntu-14.04.sh) script.
 
 ***
 
@@ -50,6 +51,12 @@ RECOMMENDED: Executing the script using an [OINKCODE](https://www.snort.org/oink
 
 ~~~~bash
 bash Snorter.sh -o <oinkcode> -i <interface>
+~~~~
+
+It's possible to add the `OpenAppID` feature by adding the `-a` flag:
+
+~~~~bash
+bash Snorter.sh -o <oinkcode> -i <interface> -a
 ~~~~
 
 ***
@@ -127,3 +134,4 @@ curl -i --form file=@test.pcap http://ADDRESS/api/submit
 ## Special thanks to
 
 + [@goffinet](https://github.com/goffinet) for the rule enabler and for solving solving the `systemctl` issue.
++ [@rbshadow](https://github.com/rbshadow) for the `Snorter` script adapted to `Ubuntu 14.04`.

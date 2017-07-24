@@ -3,9 +3,15 @@
 # Description: Install automatically Snort + Barnyard2 + PulledPork
 # Author: Joan Bono (@joan_bono)
 # Contributor: Md. Nazrul Islam (@rbshadow)
+<<<<<<< HEAD
+# Version: 1.1.0
+# Last Modified: jbono @ 20170724
+
+=======
 # Version: 1.0.0
 # Last Modified: jbono @ 20170531
 # Last Modified: rbshadow @ 20170615
+>>>>>>> master
 
 RED='\033[0;31m'
 ORANGE='\033[0;205m'
@@ -24,6 +30,18 @@ function update_upgrade() {
 	
 }
 
+<<<<<<< HEAD
+function nghttp_install() {
+
+	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Installing development libraries. \n\n"
+	sudo apt-get install -y --force-yes autoconf libtool libluajit-5.1-dev pkg-config openssl libssl-dev
+	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Downloading ${BOLD}$NGHTTP2${NOCOLOR}.\n\n"
+	NGHTTP2=$(echo $(curl -s -k https://github.com/nghttp2/nghttp2/releases | grep -A 2 "release-title" | head -2 | grep -oP "v\d+\.\d+\.\d+" | head -1))
+	wget --no-check-certificate -P $HOME/snort_src https://github.com/nghttp2/nghttp2/releases/download/$NGHTTP2/nghttp2-$(echo $NGHTTP2 | sed -e "s/v//g").tar.gz
+	cd $HOME/snort_src/
+	tar -xzvf nghttp2-*.tar.gz
+	cd nghttp2-*
+=======
 function nghttp_insatll() {
 
 	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Installing development libraries. \n\n"
@@ -34,18 +52,46 @@ function nghttp_insatll() {
 	cd $HOME/snort_src/
 	tar -xzvf nghttp2-1.23.1.tar.gz
 	cd nghttp2-1.23.1
+>>>>>>> master
 	autoreconf -i --force
 	automake
 	autoconf
 	./configure --enable-lib-only
 	make
 	sudo make install
+<<<<<<< HEAD
+	rm -r nghttp2-*.tar.gz > /dev/null 2>&1
+
+}
+
+function install_openappid() {
+	#Installing OpenAppID
+	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Installing ${BOLD}$OpenAppID${NOCOLOR}.\n\n"
+	cd $HOME/snort_src/
+	OPENAPPVERSION=$(curl -s -k https://snort.org/downloads | grep -i "snort-openappid.tar.gz" | grep -oP "\/downloads\/openappid\/\d+")
+	wget --no-check-certificate -P $HOME/snort_src/ https://snort.org$(echo $OPENAPPVERSION) -O snort-openappid.tar.gz
+	sudo mkdir openappid 
+	mv snort-openappid.tar.gz $HOME/snort_src/openappid	
+	cd $HOME/snort_src/openappid	
+	tar -xvzf snort-openappid.tar.gz
+	rm -r snort-openappid.tar.gz > /dev/null 2>&1
+	
+	#Moving files and Create a directory for thirdparty developed apps detector
+	sudo cp -R $HOME/snort_src/openappid/odp/ /etc/snort/rules
+	sudo mkdir /usr/local/lib/thirdparty	
+	
+=======
+>>>>>>> master
 }
 
 function snort_install() {
 
 	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Installing dependencies.\n\n"
+<<<<<<< HEAD
+	sudo apt-get install -y --force-yes build-essential libpcap-dev libpcre3-dev libdumbnet-dev bison flex zlib1g-dev git locate vim 
+=======
 	sudo apt-get install -y --force-yes build-essential libpcap-dev libpcre3-dev libdumbnet-dev bison flex zlib1g-dev git locate vim libluajit-5.1-dev pkg-config openssl libssl-dev
+>>>>>>> master
 	
 	#Downloading DAQ and SNORT
 	cd $HOME/snort_src/
@@ -53,6 +99,10 @@ function snort_install() {
 	wget --no-check-certificate -P $HOME/snort_src https://snort.org/downloads/snort/$DAQ.tar.gz
 	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Downloading ${BOLD}$SNORT${NOCOLOR}.\n\n"
 	wget --no-check-certificate -P $HOME/snort_src https://snort.org/downloads/snort/$SNORT.tar.gz
+	
+	if [ ! -z "${OPENAPPID}" ] ; then
+		nghttp_install
+	fi
 	
 	#Installing DAQ
 	cd $HOME/snort_src/
@@ -70,7 +120,13 @@ function snort_install() {
 	rm -r *.tar.gz > /dev/null 2>&1
 	mv snort-*/ snort           
 	cd snort
+<<<<<<< HEAD
+	./configure --enable-sourcefire $OPENAPPID
+	make 
+	sudo make install
+=======
 	./configure --enable-sourcefire --enable-open-appid && make && sudo make install
+>>>>>>> master
 	echo -ne "\n\t${GREEN}[+] INFO:${NOCOLOR} ${BOLD}$SNORT${NOCOLOR} installed successfully.\n\n"
 	cd ..
 	
@@ -102,6 +158,14 @@ function snort_install() {
 	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} /var/log/snort and /etc/snort created and configurated.\n\n"
 	sudo /usr/local/bin/snort -V
 	echo -ne "\n\t${GREEN}[+] INFO:${NOCOLOR} ${BOLD}SNORT${NOCOLOR} is successfully installed and configurated!"
+<<<<<<< HEAD
+
+	if [ ! -z "${OPENAPPID}" ] ; then
+		install_openappid
+	fi
+
+
+=======
 	
 	#Installing OpenAppID
 	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Installing ${BOLD}$OpenAppID${NOCOLOR}.\n\n"
@@ -120,7 +184,9 @@ function snort_install() {
 	
 	
 	
+>>>>>>> master
 }
+
 
 function snort_edit() {
 
@@ -134,7 +200,11 @@ function snort_edit() {
 	echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} Press ${BOLD}ENTER${NOCOLOR} to continue. "
 	read -n 1 -s
 	sudo vim /etc/snort/snort.conf -c "/ipvar EXTERNAL_NET"
+<<<<<<< HEAD
+	
+=======
 	echo -ne "\n\t${YELLOW}[!] WARNING:${NOCOLOR} Press ${BOLD}ENTER${NOCOLOR} to continue. "
+>>>>>>> master
 	echo -ne "\n\t${CYAN}[i] INFO:${NOCOLOR} Adding ${BOLD}RULE_PATH${NOCOLOR} to snort.conf file"
 	sudo sed -i 's/RULE_PATH\ \.\.\//RULE_PATH\ \/etc\/snort\//g' /etc/snort/snort.conf
 	sudo sed -i 's/_LIST_PATH\ \.\.\//_LIST_PATH\ \/etc\/snort\//g' /etc/snort/snort.conf
@@ -579,7 +649,9 @@ function help_usage() {
 	
 	echo -ne "\n\t\t${YELLOW}USAGE:${NOCOLOR} $0 -i ${GREEN}INTERFACE${NOCOLOR}"
 	echo -ne "\n\t\t${YELLOW}USAGE:${NOCOLOR} $0 -o ${GREEN}OINKCODE${NOCOLOR} -i ${GREEN}INTERFACE${NOCOLOR}"
-	echo -ne "\n\t\t${YELLOW}Example:${NOCOLOR} $0 -o ${GREEN}123456abcdefgh${NOCOLOR} -i ${GREEN}eth0${NOCOLOR}\n\n"
+	echo -ne "\n\t\t${YELLOW}USAGE:${NOCOLOR} $0 -o ${GREEN}OINKCODE${NOCOLOR} -i ${GREEN}INTERFACE${NOCOLOR} -a ${GREEN}--enable-open-appid${NOCOLOR}"
+	echo -ne "\n\t\t${YELLOW}Example:${NOCOLOR} $0 -o ${GREEN}123456abcdefgh${NOCOLOR} -i ${GREEN}eth0${NOCOLOR}"
+	echo -ne "\n\t\t${YELLOW}Example:${NOCOLOR} $0 -o ${GREEN}123456abcdefgh${NOCOLOR} -i ${GREEN}eth0${NOCOLOR} -a ${GREEN}--enable-open-appid${NOCOLOR}\n\n"
 	exit 0
 
 }
@@ -604,7 +676,7 @@ function main() {
 
 banner
 
-while getopts ":o:i:" OPTION; do
+while getopts ":o:i:a" OPTION; do
     case "${OPTION}" in
         o)
             OINKCODE=${OPTARG}
@@ -612,6 +684,9 @@ while getopts ":o:i:" OPTION; do
         i)
             INTERFACE=${OPTARG}
             ;;
+        a)
+	   OPENAPPID="--enable-open-appid"
+	   ;;
         *)
             help_usage
             ;;
