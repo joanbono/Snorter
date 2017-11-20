@@ -597,7 +597,7 @@ fi
 if [ "$(echo ${#OINKCODE})" -eq 40 ]; then
 	
 	MACHINE=$(echo $(uname -m))
-	SNORT=$(echo $(curl -s -k https://www.snort.org | grep "wget" | grep -oP "snort\-\d.\d\.\d(\.\d)?"))
+	SNORT=$(echo $(curl -s -k https://www.snort.org | grep "wget" | grep -oP "snort\-\d.\d\.\d{1,3}"))
 	DAQ=$(echo $(curl -s -k https://www.snort.org | grep "wget" | grep -oP "daq\-\d\.\d\.\d"))
 
 	echo -ne "\n\t\t${GREEN}[+] OINKCODE:${NOCOLOR} ${OINKCODE}"
