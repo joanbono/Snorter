@@ -2,8 +2,8 @@
 # Title: Snorter.sh
 # Description: Install automatically Snort + Barnyard2 + PulledPork
 # Author: Joan Bono (@joan_bono)
-# Version: 1.0.0
-# Last Modified: jbono @ 20170531
+# Version: 1.0.1
+# Last Modified: jbono @ 20171122
 
 RED='\033[0;31m'
 ORANGE='\033[0;205m'
@@ -603,7 +603,7 @@ elif [ "$(echo ${#OINKCODE})" -lt 40 ] && [ "$(echo ${#OINKCODE})" -gt 0 ]; then
 elif [ $(echo ${#OINKCODE}) -lt 40 ] || [ $(echo ${#OINKCODE}) -gt 1 ]; then
 	
 	MACHINE=$(echo $(uname -m))
-	SNORT=$(echo $(curl -s -k https://www.snort.org | grep "wget" | grep -oP "snort\-\d.\d\.\d(\.\d)?"))
+	SNORT=$(echo $(curl -s -k https://www.snort.org | grep "wget" | grep -oP "snort\-\d.\d\.\d{1,3}"))
 	DAQ=$(echo $(curl -s -k https://www.snort.org | grep "wget" | grep -oP "daq\-\d\.\d\.\d"))
 
 	echo -ne "\n\t\t${GREEN}[+] OINKCODE:${NOCOLOR} No OINKCODE provided."
