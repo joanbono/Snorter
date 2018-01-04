@@ -2,8 +2,8 @@
 # Title: Snorter.sh
 # Description: Install automatically Snort + Barnyard2 + PulledPork
 # Author: Joan Bono (@joan_bono)
-# Version: 1.0.1
-# Last Modified: jbono @ 20171122
+# Version: 1.0.2
+# Last Modified: jbono @ 20180104
 
 RED='\033[0;31m'
 ORANGE='\033[0;205m'
