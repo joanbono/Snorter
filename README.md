@@ -125,6 +125,12 @@ curl -i --form file=@test.pcap http://ADDRESS/api/submit
 
 ***
 
+## Stargazers over time
+
+[![Stargazers over time](https://starcharts.herokuapp.com/joanbono/Snorter.svg)](https://starcharts.herokuapp.com/joanbono/Snorter)
+      
+***
+
 ## Special thanks to
 
 + [@goffinet](https://github.com/goffinet) for the rule enabler and for solving solving the `systemctl` issue.
