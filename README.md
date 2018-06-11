@@ -15,7 +15,8 @@ Successfully tested in:
 
 + Raspberry Pi + Raspbian Jessie
 + Kali Linux Rolling Release
-+ Debian 8.0+
++ Debian 9.0+
++ Ubuntu 18.04
 + Ubuntu 14.04 using the [`Snorter_Ubuntu-14.04.sh`](src/Snorter_Ubuntu-14.04.sh) script.
 
 ***
