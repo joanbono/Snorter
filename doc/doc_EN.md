@@ -35,7 +35,7 @@ Install `Snort` + `Barnyard2` + `PulledPork` automatically
 
 - Cloning the repository:
 ~~~bash
-git clone https://github.com/joanbono/Snorter.git` 
+git clone https://github.com/joanbono/Snorter.git
 cd Snorter/src
 bash Snorter.sh -h
 ~~~
